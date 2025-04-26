@@ -1,94 +1,94 @@
-# 10x Astro Starter
+# RoadYourMap
 
-A modern, opinionated starter template for building fast, accessible, and AI-friendly web applications.
+**RoadYourMap** is a web application that automates the generation of personalized learning roadmaps for programming languages and IT technologies. Designed as an MVP with a focus on simplicity, clarity, and ease of use, it helps technical learners plan, track, and manage their learning journey.
+
+## Table of Contents
+- [RoadYourMap](#roadyourmap)
+  - [Table of Contents](#table-of-contents)
+  - [Tech Stack](#tech-stack)
+  - [Getting Started Locally](#getting-started-locally)
+    - [Prerequisites](#prerequisites)
+    - [Setup](#setup)
+  - [Available Scripts](#available-scripts)
+  - [Project Scope](#project-scope)
+    - [Included in MVP](#included-in-mvp)
+    - [Out of Scope for MVP](#out-of-scope-for-mvp)
+  - [Project Status](#project-status)
+  - [License](#license)
 
 ## Tech Stack
 
-- [Astro](https://astro.build/) v5.5.5 - Modern web framework for building fast, content-focused websites
-- [React](https://react.dev/) v19.0.0 - UI library for building interactive components
-- [TypeScript](https://www.typescriptlang.org/) v5 - Type-safe JavaScript
-- [Tailwind CSS](https://tailwindcss.com/) v4.0.17 - Utility-first CSS framework
+- **Frontend:** Astro 5, React 19, TypeScript 5
+- **Styling:** Tailwind CSS 4, Shadcn/ui
+- **Backend-as-a-Service:** Supabase (Authentication & PostgreSQL)
+- **AI Integration:** OpenRouter.ai for model access (OpenAI, Anthropic, Google, etc.)
+- **Node Version:** 22.14.0 (via .nvmrc)
+- **CI/CD & Hosting:** GitHub Actions, DigitalOcean (Docker)
 
-## Prerequisites
+## Getting Started Locally
 
-- Node.js v22.14.0 (as specified in `.nvmrc`)
-- npm (comes with Node.js)
+### Prerequisites
+- Node.js (v22.14.0)
+- npm (or Yarn)
+- A Supabase project (URL & Anon Key)
+- An OpenRouter.ai API key
 
-## Getting Started
-
+### Setup
 1. Clone the repository:
-
 ```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
-```
-
+ git clone https://github.com/kabix-dk/roadyourmap.git
+ cd roadyourmap
+```  
 2. Install dependencies:
-
 ```bash
-npm install
-```
-
-3. Run the development server:
-
+ npm install
+```  
+3. Create a `.env` file in the project root and add your environment variables:
+```env
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+OPENROUTER_API_KEY=your_openrouter_api_key
+```  
+4. Start the development server:
 ```bash
-npm run dev
-```
-
-4. Build for production:
-
-```bash
-npm run build
-```
+ npm run dev
+```  
+5. Open your browser and navigate to `http://localhost:3000` to see the app.
 
 ## Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
+In the project directory, you can run:
 
-## Project Structure
+- **`npm run dev`**: Runs the app in development mode.
+- **`npm run build`**: Builds the production-ready site.
+- **`npm run preview`**: Previews the built site locally.
+- **`npm run astro`**: Access Astro CLI commands.
+- **`npm run lint`**: Runs ESLint across the codebase.
+- **`npm run lint:fix`**: Runs ESLint with auto-fix.
+- **`npm run format`**: Formats code with Prettier.
 
-```md
-.
-├── src/
-│   ├── layouts/    # Astro layouts
-│   ├── pages/      # Astro pages
-│   │   └── api/    # API endpoints
-│   ├── components/ # UI components (Astro & React)
-│   └── assets/     # Static assets
-├── public/         # Public assets
-```
+## Project Scope
 
-## AI Development Support
+### Included in MVP
+- **Roadmap Generation:** AI-powered creation of 2–3 level learning roadmaps based on user-provided experience, technology, and goals.
+- **Interactive Roadmap:** Expandable list view, edit elements (add, remove, reorder), and mark items as complete.
+- **Progress Tracking:** Progress bar updates with completed items.
+- **User Accounts:** Supabase-based registration, login, and session management.
+- **Roadmap Storage:** Save up to 5 roadmaps per user, with manual save and auto-save on logout.
+- **Error Handling:** User-friendly validation and error messages throughout the app.
 
-This project is configured with AI development tools to enhance the development experience, providing guidelines for:
+### Out of Scope for MVP
+- Mobile-specific UI/UX
+- Exporting or cloning roadmaps
+- Advanced onboarding flows or UI personalization
+- Rich visual editors beyond list-based views
+- Comprehensive user profiles or advanced notifications
+- Usability testing integrations
 
-- Project structure
-- Coding practices
-- Frontend development
-- Styling with Tailwind
-- Accessibility best practices
-- Astro and React guidelines
+## Project Status
 
-### Cursor IDE
-
-The project includes AI rules in `.cursor/rules/` directory that help Cursor IDE understand the project structure and provide better code suggestions.
-
-### GitHub Copilot
-
-AI instructions for GitHub Copilot are available in `.github/copilot-instructions.md`
-
-### Windsurf
-
-The `.windsurfrules` file contains AI configuration for Windsurf.
-
-## Contributing
-
-Please follow the AI guidelines and coding practices defined in the AI configuration files when contributing to this project.
+This project is currently in **MVP / Alpha** stage. Core features are under active development. Contributions and feedback are welcome!
 
 ## License
 
-MIT
+This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
