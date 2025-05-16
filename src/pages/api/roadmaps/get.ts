@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { getRoadmap } from "../../../lib/services/get-roadmap";
+import { getRoadmap } from "../../../lib/services/roadmaps.service";
 
 // Validation schema for roadmapId
 const roadmapIdSchema = z.string().uuid({

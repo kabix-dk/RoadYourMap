@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import type { CreateRoadmapCommand } from "../../types";
-import { generateRoadmapItems } from "../../lib/ai-service";
+import type { CreateRoadmapCommand } from "../../../types";
+import { generateRoadmapItems } from "../../../lib/ai.service";
 
 export const prerender = false;
 
