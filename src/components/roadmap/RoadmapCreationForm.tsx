@@ -51,8 +51,8 @@ export default function RoadmapCreationForm() {
   const onSubmit = async (data: CreateRoadmapFormData) => {
     try {
       setApiError(null);
-      const roadmap = await generateRoadmap(data);
-      navigate(`/roadmaps/${roadmap.id}`);
+      await generateRoadmap(data);
+      navigate("/roadmaps/preview");
     } catch (error) {
       if (error instanceof RoadmapError) {
         setApiError(error.message);
