@@ -1,0 +1,56 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { RoadmapDisplay } from '@/components/roadmap/RoadmapDisplay';
+import type { RoadmapDetailsDto, RoadmapItemDto } from '@/types';
+import { generateRoadmapItems } from '@/lib/ai.service';
+
+// Create mock data for development/preview
+const mockCommand = {
+  title: 'Java Development Roadmap',
+  experience_level: 'Beginner',
+  technology: 'Java',
+  goals: 'Learn Java programming from scratch',
+  additional_info: null,
+};
+
+// First generate the base items
+const mockItems = await generateRoadmapItems(mockCommand);
+
+// Transform the items to match RoadmapItemDto type exactly
+const mockRoadmapItems: RoadmapItemDto[] = mockItems.map((item, index) => {
+  const id = `mock-item-${index + 1}`;
+  return {
+    id,
+    parent_item_id: item.parent_item_id?.replace('mock-item-', '') ? `mock-item-${item.parent_item_id?.replace('mock-item-', '')}` : null,
+    title: item.title,
+    description: item.description ?? null,
+    level: item.level,
+    position: item.position,
+    is_completed: false,
+    completed_at: null
+  };
+});
+
+// Create the full roadmap data
+const mockRoadmapData: RoadmapDetailsDto = {
+  id: 'mock-roadmap-1',
+  title: mockCommand.title,
+  experience_level: mockCommand.experience_level,
+  technology: mockCommand.technology,
+  goals: mockCommand.goals,
+  additional_info: mockCommand.additional_info,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+  items: mockRoadmapItems,
+};
+
+// Use mock data instead of expecting it from props
+const roadmapData = mockRoadmapData;
+---
+
+<Layout title="Preview Roadmap">
+  <main class="container mx-auto py-8 px-4">
+    <h1 class="text-3xl font-bold mb-8">Preview Generated Roadmap</h1>
+    <RoadmapDisplay client:load roadmapData={roadmapData} />
+  </main>
+</Layout> 
