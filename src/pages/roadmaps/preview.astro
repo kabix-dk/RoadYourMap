@@ -13,27 +13,12 @@ const mockCommand = {
   additional_info: null,
 };
 
-// First generate the base items
-const mockItems = await generateRoadmapItems(mockCommand);
-
-// Transform the items to match RoadmapItemDto type exactly
-const mockRoadmapItems: RoadmapItemDto[] = mockItems.map((item, index) => {
-  const id = `mock-item-${index + 1}`;
-  return {
-    id,
-    parent_item_id: item.parent_item_id?.replace('mock-item-', '') ? `mock-item-${item.parent_item_id?.replace('mock-item-', '')}` : null,
-    title: item.title,
-    description: item.description ?? null,
-    level: item.level,
-    position: item.position,
-    is_completed: false,
-    completed_at: null
-  };
-});
+// Generate the roadmap items with proper UUIDs
+const mockRoadmapItems = await generateRoadmapItems(mockCommand);
 
 // Create the full roadmap data
 const mockRoadmapData: RoadmapDetailsDto = {
-  id: 'mock-roadmap-1',
+  id: '550e8400-e29b-41d4-a716-446655440999', // Mock roadmap ID
   title: mockCommand.title,
   experience_level: mockCommand.experience_level,
   technology: mockCommand.technology,
@@ -41,7 +26,16 @@ const mockRoadmapData: RoadmapDetailsDto = {
   additional_info: mockCommand.additional_info,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
-  items: mockRoadmapItems,
+  items: mockRoadmapItems.map(item => ({
+    id: item.id,
+    parent_item_id: item.parent_item_id,
+    title: item.title,
+    description: item.description,
+    level: item.level,
+    position: item.position,
+    is_completed: item.is_completed,
+    completed_at: null,
+  })) as RoadmapItemDto[],
 };
 
 // Use mock data instead of expecting it from props

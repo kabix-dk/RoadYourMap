@@ -12,7 +12,7 @@ export class RoadmapError extends Error {
 
 export async function generateRoadmap(data: CreateRoadmapCommand): Promise<RoadmapDetailsDto> {
   try {
-    const response = await fetch("/api/roadmaps/generate", {
+    const response = await fetch("/api/roadmaps", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -30,6 +30,9 @@ export async function generateRoadmap(data: CreateRoadmapCommand): Promise<Roadm
       }
       if (response.status === 429) {
         throw new RoadmapError("Osiągnięto limit 5 roadmap. Nie można utworzyć nowej.", 429);
+      }
+      if (response.status === 502) {
+        throw new RoadmapError("Błąd usługi generowania roadmapy. Spróbuj ponownie później.", 502);
       }
       throw new RoadmapError("Wystąpił nieoczekiwany błąd serwera. Spróbuj ponownie później.", 500);
     }
