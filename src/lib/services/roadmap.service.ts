@@ -12,7 +12,7 @@ export class RoadmapError extends Error {
 
 export async function generateRoadmap(data: CreateRoadmapCommand): Promise<RoadmapDetailsDto> {
   try {
-    const response = await fetch("/api/roadmaps", {
+    const response = await fetch("/api/roadmaps/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
