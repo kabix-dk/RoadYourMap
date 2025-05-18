@@ -11,18 +11,14 @@
 ### 2.1 Roadmaps
 
 #### GET /api/roadmaps
-- Description: List user's roadmaps with pagination
+- Description: List user's roadmaps
 - Headers: `Authorization: Bearer <token>`
-- Query Params:
-  - `limit`: integer (default: 10)
-  - `offset`: integer (default: 0)
 - Response (200 OK):
   ```json
   {
-    "data": [
+    "roadmaps": [
       { "id":"uuid", "title":"string", "experience_level":"string", "technology":"string", "goals":"string", "created_at":"timestamp", "updated_at":"timestamp" }
-    ],
-    "pagination": { "limit":10, "offset":0, "total":number }
+    ]
   }
   ```
 

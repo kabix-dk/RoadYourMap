@@ -1,15 +1,15 @@
 ---
-import Layout from '@/layouts/Layout.astro';
-import { RoadmapDisplay } from '@/components/roadmap/RoadmapDisplay';
-import type { RoadmapDetailsDto, RoadmapItemDto } from '@/types';
-import { generateRoadmapItems } from '@/lib/temp/mocked.roadmap.service';
+import Layout from "@/layouts/Layout.astro";
+import { RoadmapDisplay } from "@/components/roadmap/RoadmapDisplay";
+import type { RoadmapDetailsDto, RoadmapItemDto } from "@/types";
+import { generateRoadmapItems } from "@/lib/temp/mocked.roadmap.service";
 
 // Create mock data for development/preview
 const mockCommand = {
-  title: 'Java Development Roadmap',
-  experience_level: 'Beginner',
-  technology: 'Java',
-  goals: 'Learn Java programming from scratch',
+  title: "Java Development Roadmap",
+  experience_level: "Beginner",
+  technology: "Java",
+  goals: "Learn Java programming from scratch",
   additional_info: null,
 };
 
@@ -18,7 +18,7 @@ const mockRoadmapItems = await generateRoadmapItems(mockCommand);
 
 // Create the full roadmap data
 const mockRoadmapData: RoadmapDetailsDto = {
-  id: '550e8400-e29b-41d4-a716-446655440999', // Mock roadmap ID
+  id: "550e8400-e29b-41d4-a716-446655440999", // Mock roadmap ID
   title: mockCommand.title,
   experience_level: mockCommand.experience_level,
   technology: mockCommand.technology,
@@ -26,7 +26,7 @@ const mockRoadmapData: RoadmapDetailsDto = {
   additional_info: mockCommand.additional_info,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
-  items: mockRoadmapItems.map(item => ({
+  items: mockRoadmapItems.map((item) => ({
     id: item.id,
     parent_item_id: item.parent_item_id,
     title: item.title,
@@ -47,4 +47,4 @@ const roadmapData = mockRoadmapData;
     <h1 class="text-3xl font-bold mb-8">Preview Generated Roadmap</h1>
     <RoadmapDisplay client:load roadmapData={roadmapData} />
   </main>
-</Layout> 
+</Layout>
