@@ -1,5 +1,5 @@
-import type { CreateRoadmapCommand } from "../types";
-import type { TablesInsert } from "../db/database.types";
+import type { CreateRoadmapCommand } from "../../types";
+import type { TablesInsert } from "../../db/database.types";
 
 export async function generateRoadmapItems(
   roadmapData: CreateRoadmapCommand

@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { supabaseAdmin, DEFAULT_USER_ID } from "@/db/supabase.client";
 import { createRoadmapFormSchema } from "@/components/roadmap/RoadmapCreationForm";
-import { generateRoadmapItems } from "@/lib/mocked.roadmap.service";
+import { generateRoadmapItems } from "@/lib/temp/mocked.roadmap.service";
 import type { TablesInsert } from "@/db/database.types";
 
 export const POST: APIRoute = async ({ request }) => {
@@ -23,7 +23,6 @@ export const POST: APIRoute = async ({ request }) => {
       .eq("user_id", DEFAULT_USER_ID);
 
     if (countError) {
-      console.error("Error counting roadmaps:", countError);
       return new Response(JSON.stringify({ error: "Internal Server Error", details: countError }), { status: 500 });
     }
 
@@ -44,7 +43,6 @@ export const POST: APIRoute = async ({ request }) => {
       .single();
 
     if (roadmapError) {
-      console.error("Error inserting roadmap:", roadmapError);
       return new Response(JSON.stringify({ error: "Internal Server Error", details: roadmapError }), { status: 500 });
     }
 
@@ -58,7 +56,6 @@ export const POST: APIRoute = async ({ request }) => {
     const { error: itemsError } = await supabaseAdmin.from("roadmap_items").insert(roadmapItems);
 
     if (itemsError) {
-      console.log("Error inserting roadmap items:", itemsError);
       // Rollback by deleting the roadmap if items insertion fails
       await supabaseAdmin.from("roadmaps").delete().eq("id", roadmap.id);
       return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
@@ -81,7 +78,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Remove user_id from response
-    const { user_id: _, ...roadmapDto } = roadmapWithItems;
+    const { user_id: _, ...roadmapDto } = roadmapWithItems; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     return new Response(JSON.stringify({ roadmap: roadmapDto }), {
       status: 201,
@@ -90,7 +87,6 @@ export const POST: APIRoute = async ({ request }) => {
       },
     });
   } catch (error) {
-    console.error("Error creating roadmap (full error):", error);
     return new Response(JSON.stringify({ error: "Internal Server Error", details: error }), { status: 500 });
   }
 };
