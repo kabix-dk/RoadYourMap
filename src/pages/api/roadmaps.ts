@@ -1,12 +1,13 @@
 import type { APIRoute } from "astro";
 import { dashboardService } from "@/lib/services/dashboard.service";
+import { ADMIN_USER_ID } from "@/lib/utils";
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ locals, request }) => {
+export const GET: APIRoute = async () => {
   try {
-    // hardcode admin user id - just for dev purposes
-    const userId = "ea55fc94-ba42-47fc-bc46-e75664a8b2ba";
+    // Use admin user id from utils
+    const userId = ADMIN_USER_ID;
 
     // Fetch user's roadmaps
     const roadmaps = await dashboardService.getUserRoadmaps(userId);
