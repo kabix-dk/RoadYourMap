@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import { isValidUUID } from "../../../lib/utils/validation";
-import { RoadmapService } from "../../../lib/services/RoadmapService";
+import { RoadmapService } from "../../../lib/services/roadmap.service";
 import { ADMIN_USER_ID } from "@/lib/utils";
 
 export const DELETE: APIRoute = async ({ params }) => {

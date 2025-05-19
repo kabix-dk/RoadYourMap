@@ -22,7 +22,7 @@
   }
   ```
 
-#### POST /api/roadmaps
+#### POST /api/roadmaps/generate
 - Description: Create and generate a new roadmap via AI
 - Headers: `Authorization: Bearer <token>`
 - Request Body:
@@ -172,7 +172,6 @@
 - **Business Logic**:
   - Max 5 roadmaps per user enforced by DB trigger; API catches exception and returns 400 with message.
   - AI generation is atomic within `POST /api/roadmaps`.
-  - Pagination on listing endpoints (`limit`, `offset`).
   - Sorting by `position` and grouping by `parent_item_id` for hierarchical display.
   - Uniform error format: `{ code: string, message: string, details?: any }`.
 
