@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/db/supabase.client";
+import type { RoadmapDetailsDto, RoadmapDto, RoadmapItemDto } from "../../types";
 
 interface DeleteResult {
   success: boolean;
@@ -64,6 +65,55 @@ export class RoadmapService {
         status: 500,
         error: "An unexpected error occurred while deleting roadmap",
       };
+    }
+  }
+
+  async getRoadmapDetails(roadmapId: string, userId: string): Promise<RoadmapDetailsDto | null> {
+    try {
+      // 1. Get the roadmap
+      const { data: roadmap, error: roadmapError } = await supabaseAdmin
+        .from("roadmaps")
+        .select("*")
+        .eq("id", roadmapId)
+        .eq("user_id", userId)
+        .single();
+
+      if (roadmapError || !roadmap) {
+        console.error("Error fetching roadmap:", roadmapError);
+        return null;
+      }
+
+      // 2. Get all roadmap items
+      const { data: items, error: itemsError } = await supabaseAdmin
+        .from("roadmap_items")
+        .select("id, parent_item_id, title, description, level, position, is_completed, completed_at")
+        .eq("roadmap_id", roadmapId)
+        .order("position");
+
+      if (itemsError) {
+        console.error("Error fetching roadmap items:", itemsError);
+        return null;
+      }
+
+      // 3. Transform to DTO
+      const roadmapDto: RoadmapDto = {
+        id: roadmap.id,
+        title: roadmap.title,
+        experience_level: roadmap.experience_level,
+        technology: roadmap.technology,
+        goals: roadmap.goals,
+        additional_info: roadmap.additional_info,
+        created_at: roadmap.created_at,
+        updated_at: roadmap.updated_at,
+      };
+
+      return {
+        ...roadmapDto,
+        items: items as RoadmapItemDto[],
+      };
+    } catch (error) {
+      console.error("Error in getRoadmapDetails:", error);
+      throw error;
     }
   }
 }
