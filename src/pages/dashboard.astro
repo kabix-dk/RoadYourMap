@@ -1,0 +1,14 @@
+---
+import RoadmapListContainer from "../components/dashboard/RoadmapListContainer";
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Dashboard - Your Roadmaps">
+  <main class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold">Your Roadmaps</h1>
+    </div>
+
+    <RoadmapListContainer client:load />
+  </main>
+</Layout>
