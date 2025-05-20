@@ -46,13 +46,13 @@ export default function RoadmapCard({ roadmap, onPreview, onEdit, onDelete }: Ro
         </div>
       </CardContent>
       <CardFooter className="flex justify-end gap-2">
-        <Button variant="secondary" size="sm" onClick={() => onPreview(roadmap.id)}>
+        <Button variant="default" size="sm" onClick={() => onPreview(roadmap.id)} className="cursor-pointer">
           Preview
         </Button>
-        <Button variant="outline" size="sm" onClick={() => onEdit(roadmap.id)}>
+        <Button variant="outline" size="sm" onClick={() => onEdit(roadmap.id)} className="cursor-pointer">
           Edit
         </Button>
-        <Button variant="destructive" size="sm" onClick={() => onDelete(roadmap)}>
+        <Button variant="destructive" size="sm" onClick={() => onDelete(roadmap)} className="cursor-pointer">
           Delete
         </Button>
       </CardFooter>
