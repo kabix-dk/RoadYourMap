@@ -4,7 +4,7 @@ import {
   complexSchemaExample,
   jsonSchemaExample,
   minimalJsonTest,
-} from "../../../lib/utils/openrouter.example";
+} from "../../../lib/examples/openrouter.example";
 import { generateRoadmapExample } from "@/lib/examples/ai-roadmap.example";
 
 export const POST: APIRoute = async () => {
