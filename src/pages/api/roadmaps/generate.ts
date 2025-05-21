@@ -1,8 +1,10 @@
 import type { APIRoute } from "astro";
 import { supabaseAdmin, DEFAULT_USER_ID } from "@/db/supabase.client";
 import { createRoadmapFormSchema } from "@/components/roadmap/RoadmapCreationForm";
-import { generateRoadmapItems } from "@/lib/temp/mocked.roadmap.service";
+// import { generateRoadmapItems } from "@/lib/temp/mocked.roadmap.service";
+import { AiRoadmapService } from "@/lib/services/ai-roadmap.service";
 import type { TablesInsert } from "@/db/database.types";
+import { generateRoadmapExample } from "@/lib/examples/ai-roadmap.example";
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -30,8 +32,18 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: "User has reached max roadmaps" }), { status: 400 });
     }
 
+    // Get API key from environment variables
+    const apiKey = import.meta.env.OPENROUTER_API_KEY;
+    if (!apiKey) {
+      throw new Error("OPENROUTER_API_KEY is required in environment variables");
+    }
+
+    // Create an instance of AiRoadmapService
+    const roadmapService = new AiRoadmapService(apiKey);
+
     // Generate roadmap items using AI
-    const items = await generateRoadmapItems(validationResult.data);
+    // const items = await generateRoadmapItems(validationResult.data);
+    const items = await roadmapService.generateRoadmapItems(validationResult.data);
 
     const { data: roadmap, error: roadmapError } = await supabaseAdmin
       .from("roadmaps")

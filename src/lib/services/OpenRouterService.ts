@@ -241,15 +241,29 @@ export class OpenRouterService {
         // Jeśli wymaga ścisłej walidacji, używamy Zod do weryfikacji schematu
         if (responseFormat.json_schema.strict) {
           try {
+            // Check if the expected schema requires a container object with 'items' property
+            const schemaRequiresItems =
+              Array.isArray(responseFormat.json_schema.schema.required) &&
+              responseFormat.json_schema.schema.required.includes("items");
+
+            // If the schema expects an 'items' property but the parsed JSON is an array,
+            // automatically wrap it in an object with an 'items' property
+            let dataToValidate = parsedJson;
+            if (schemaRequiresItems && Array.isArray(parsedJson)) {
+              dataToValidate = { items: parsedJson };
+              console.log("Wrapped array in items object for validation:", dataToValidate);
+            }
+
             // Konwersja schematu JSON na schemat Zod
             const schema = this.convertJsonSchemaToZod(responseFormat.json_schema.schema);
 
             // Walidacja
-            const validatedData = schema.parse(parsedJson);
+            const validatedData = schema.parse(dataToValidate);
             return validatedData;
           } catch (validationError) {
+            console.error("Validation error details:", validationError);
             throw new Error(
-              `Schemat JSON nie zgadza się: ${validationError instanceof Error ? validationError.message : String(validationError)}`
+              `Schemat JSON nie zgadza się: ${validationError instanceof Error ? validationError.message : JSON.stringify(validationError)}`
             );
           }
         }
@@ -259,6 +273,7 @@ export class OpenRouterService {
 
       return content;
     } catch (error) {
+      console.error("Error parsing response:", error);
       throw new Error(`Failed to parse response: ${error instanceof Error ? error.message : String(error)}`);
     }
   }

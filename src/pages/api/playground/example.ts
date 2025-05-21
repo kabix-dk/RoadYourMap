@@ -5,6 +5,7 @@ import {
   jsonSchemaExample,
   minimalJsonTest,
 } from "../../../lib/utils/openrouter.example";
+import { generateRoadmapExample } from "@/lib/examples/ai-roadmap.example";
 
 export const POST: APIRoute = async () => {
   // Sprawdzenie, czy klucz API jest skonfigurowany
@@ -34,6 +35,7 @@ export const POST: APIRoute = async () => {
     // await jsonSchemaExample();
     // await complexSchemaExample();
     // await minimalJsonTest();
+    await generateRoadmapExample();
 
     return new Response(
       JSON.stringify({
