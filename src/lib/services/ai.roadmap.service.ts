@@ -1,6 +1,6 @@
 import type { CreateRoadmapCommand } from "../../types";
 import type { TablesInsert } from "../../db/database.types";
-import { OpenRouterService } from "./OpenRouterService";
+import { OpenRouterService } from "./openrouter.service";
 
 /**
  * Service that uses AI to generate roadmap items based on user input
@@ -33,13 +33,25 @@ export class AiRoadmapService {
       const result = await this.openRouter.sendMessage({
         systemMessage:
           "You are an expert in creating learning roadmaps. Generate a comprehensive, hierarchical learning path for the given technology or topic.",
-        userMessage: `Create a detailed learning roadmap for ${roadmapData.technology} with the following requirements:
-           - The roadmap should have 3 main sections (level 1): "Getting Started", "Core Concepts", and "Advanced Topics"
-           - Each section should have 3 subsections (level 2)
-           - Each subsection should have 1 specific task or exercise (level 3)
-           - Your response should be a JSON array of items, where each item includes: id (UUID), parent_item_id (null for level 1), title, description, level (1, 2, or 3), position (incremental number for ordering), and is_completed (false).
-           
-           Respond with a JSON object that has an 'items' property containing the array of roadmap items.`,
+        userMessage: `Create a detailed learning roadmap with the following specifications:
+
+**Roadmap Details:**
+- Title: ${roadmapData.title}
+- Technology/Topic: ${roadmapData.technology}
+- Experience Level: ${roadmapData.experience_level}
+- Learning Goals: ${roadmapData.goals}${roadmapData.additional_info ? `\n- Additional Context: ${roadmapData.additional_info}` : ""}
+
+**Requirements:**
+- Create 3-5 main sections (level 1) that best represent the learning journey for this specific technology/topic
+- Each main section should have 2-7 subsections (level 2) based on the complexity and scope of that section
+- Each subsection should have 2-7 specific tasks, exercises, or learning steps (level 3)
+- Design the structure organically based on the technology, experience level, and learning goals
+- Tailor the content complexity and approach based on the specified experience level
+- Ensure the roadmap items align with the stated learning goals
+- Consider any additional context provided to customize the learning path
+- Your response should be a JSON array of items, where each item includes: id (UUID), parent_item_id (null for level 1), title, description, level (1, 2, or 3), position (incremental number for ordering), and is_completed (false).
+
+Respond with a JSON object that has an 'items' property containing the array of roadmap items.`,
         responseFormat: {
           type: "json_schema",
           json_schema: {

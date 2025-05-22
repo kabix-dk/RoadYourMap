@@ -2,7 +2,7 @@
  * Example demonstrating how to use the AiRoadmapService to generate roadmap items
  */
 
-import { AiRoadmapService } from "../services/ai-roadmap.service";
+import { AiRoadmapService } from "../services/ai.roadmap.service";
 import type { CreateRoadmapCommand } from "../../types";
 
 /**

@@ -31,10 +31,10 @@ export default function DeleteConfirmationDialog({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="flex gap-2 justify-end">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="cursor-pointer">
             Cancel
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
+          <Button variant="destructive" onClick={onConfirm} className="cursor-pointer">
             Delete
           </Button>
         </DialogFooter>

@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { supabaseAdmin, DEFAULT_USER_ID } from "@/db/supabase.client";
 import { createRoadmapFormSchema } from "@/components/roadmap/RoadmapCreationForm";
 // import { generateRoadmapItems } from "@/lib/temp/mocked.roadmap.service";
-import { AiRoadmapService } from "@/lib/services/ai-roadmap.service";
+import { AiRoadmapService } from "@/lib/services/ai.roadmap.service";
 import type { TablesInsert } from "@/db/database.types";
 import { generateRoadmapExample } from "@/lib/examples/ai-roadmap.example";
 

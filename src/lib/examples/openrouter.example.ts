@@ -2,7 +2,7 @@
  * Przykład użycia serwisu OpenRouterService
  */
 
-import { OpenRouterService } from "../services/OpenRouterService";
+import { OpenRouterService } from "../services/openrouter.service";
 
 /**
  * Przykład podstawowego użycia OpenRouterService
