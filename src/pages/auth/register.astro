@@ -1,0 +1,10 @@
+---
+import AuthLayout from "../../layouts/AuthLayout.astro";
+import RegisterForm from "../../components/auth/RegisterForm";
+---
+
+<AuthLayout title="Rejestracja - RoadYourMap">
+  <div class="bg-card border border-border rounded-lg p-6 shadow-sm">
+    <RegisterForm client:load />
+  </div>
+</AuthLayout>

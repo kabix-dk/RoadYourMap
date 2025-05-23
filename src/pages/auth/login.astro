@@ -1,0 +1,10 @@
+---
+import AuthLayout from "../../layouts/AuthLayout.astro";
+import LoginForm from "../../components/auth/LoginForm";
+---
+
+<AuthLayout title="Logowanie - RoadYourMap">
+  <div class="bg-card border border-border rounded-lg p-6 shadow-sm">
+    <LoginForm client:load />
+  </div>
+</AuthLayout>
