@@ -53,7 +53,7 @@ Kryteria akceptacji:
 - Po zalogowaniu użytkownik widzi swoje roadmapy.
 
 US-003  
-Tytuł: Wypełnienie formularza wejściowego  
+Tytuł: Wypełnienie formularza do wygenerowania roadmapy  
 Opis: Jako zalogowany użytkownik chcę wypełnić formularz dotyczący mojego doświadczenia, technologii i celów, aby wygenerować spersonalizowaną roadmapę.  
 Kryteria akceptacji:
 - Formularz zawiera wymagane pola: doświadczenie w IT, technologia/język, poziom znajomości, cele nauki, opcjonalne dodatkowe informacje.
