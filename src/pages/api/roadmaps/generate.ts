@@ -1,13 +1,32 @@
 import type { APIRoute } from "astro";
-import { supabaseAdmin, DEFAULT_USER_ID } from "@/db/supabase.client";
+import { createSupabaseServerInstance } from "@/db/supabase.client";
 import { createRoadmapFormSchema } from "@/components/roadmap/RoadmapCreationForm";
 // import { generateRoadmapItems } from "@/lib/temp/mocked.roadmap.service";
 import { AiRoadmapService } from "@/lib/services/ai.roadmap.service";
 import type { TablesInsert } from "@/db/database.types";
-import { generateRoadmapExample } from "@/lib/examples/ai-roadmap.example";
 
-export const POST: APIRoute = async ({ request }) => {
+export const prerender = false;
+
+export const POST: APIRoute = async ({ request, locals, cookies }) => {
   try {
+    // Get authenticated user from middleware
+    const { user } = locals;
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: "Unauthorized",
+            code: "UNAUTHORIZED",
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Parse and validate request body
     const data = await request.json();
     const validationResult = createRoadmapFormSchema.safeParse(data);
@@ -18,11 +37,17 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // Create Supabase server instance
+    const supabase = createSupabaseServerInstance({
+      cookies,
+      headers: request.headers,
+    });
+
     // Check roadmap limit
-    const { count: roadmapCount, error: countError } = await supabaseAdmin
+    const { count: roadmapCount, error: countError } = await supabase
       .from("roadmaps")
       .select("id", { count: "exact", head: true })
-      .eq("user_id", DEFAULT_USER_ID);
+      .eq("user_id", user.id);
 
     if (countError) {
       return new Response(JSON.stringify({ error: "Internal Server Error", details: countError }), { status: 500 });
@@ -45,11 +70,11 @@ export const POST: APIRoute = async ({ request }) => {
     // const items = await generateRoadmapItems(validationResult.data);
     const items = await roadmapService.generateRoadmapItems(validationResult.data);
 
-    const { data: roadmap, error: roadmapError } = await supabaseAdmin
+    const { data: roadmap, error: roadmapError } = await supabase
       .from("roadmaps")
       .insert({
         ...validationResult.data,
-        user_id: DEFAULT_USER_ID,
+        user_id: user.id,
       })
       .select()
       .single();
@@ -65,16 +90,16 @@ export const POST: APIRoute = async ({ request }) => {
       position: (index + 1) * 1000, // Gap-based ordering
     }));
 
-    const { error: itemsError } = await supabaseAdmin.from("roadmap_items").insert(roadmapItems);
+    const { error: itemsError } = await supabase.from("roadmap_items").insert(roadmapItems);
 
     if (itemsError) {
       // Rollback by deleting the roadmap if items insertion fails
-      await supabaseAdmin.from("roadmaps").delete().eq("id", roadmap.id);
+      await supabase.from("roadmaps").delete().eq("id", roadmap.id);
       return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
     }
 
     // Get the complete roadmap with items
-    const { data: roadmapWithItems, error: fetchError } = await supabaseAdmin
+    const { data: roadmapWithItems, error: fetchError } = await supabase
       .from("roadmaps")
       .select(
         `

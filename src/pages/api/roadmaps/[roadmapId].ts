@@ -1,14 +1,32 @@
 import type { APIRoute } from "astro";
 import { isValidUUID } from "../../../lib/utils/validation";
 import { RoadmapService } from "../../../lib/services/roadmap.service";
-import { ADMIN_USER_ID } from "@/lib/utils";
 
 const roadmapService = new RoadmapService();
-const userId = ADMIN_USER_ID;
 
-export const DELETE: APIRoute = async ({ params }) => {
+export const prerender = false;
+
+export const DELETE: APIRoute = async ({ params, locals }) => {
   try {
     const roadmapId = params.roadmapId;
+
+    // Get authenticated user from middleware
+    const { user } = locals;
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: "Unauthorized",
+            code: "UNAUTHORIZED",
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
 
     // Validate UUID format
     if (!roadmapId || !isValidUUID(roadmapId)) {
@@ -19,7 +37,7 @@ export const DELETE: APIRoute = async ({ params }) => {
     }
 
     // Delete roadmap
-    const result = await roadmapService.deleteRoadmap(roadmapId, userId);
+    const result = await roadmapService.deleteRoadmap(roadmapId, user.id);
 
     // Handle service response
     if (!result.success) {
@@ -40,11 +58,29 @@ export const DELETE: APIRoute = async ({ params }) => {
   }
 };
 
-export const GET: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async ({ params, locals }) => {
   try {
     const { roadmapId } = params;
 
-    // 1. Validate UUID format
+    // Get authenticated user from middleware
+    const { user } = locals;
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: "Unauthorized",
+            code: "UNAUTHORIZED",
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Validate UUID format
     if (!roadmapId || !isValidUUID(roadmapId)) {
       return new Response(
         JSON.stringify({
@@ -60,46 +96,8 @@ export const GET: APIRoute = async ({ params, request }) => {
       );
     }
 
-    // 2. Get and validate auth token
-    // const authHeader = request.headers.get("Authorization");
-    // if (!authHeader?.startsWith("Bearer ")) {
-    //   return new Response(
-    //     JSON.stringify({
-    //       error: {
-    //         message: "Brak tokena autoryzacyjnego.",
-    //         code: "AUTH_TOKEN_MISSING",
-    //       },
-    //     }),
-    //     {
-    //       status: 401,
-    //       headers: { "Content-Type": "application/json" },
-    //     }
-    //   );
-    // }
-
-    // 3. Get authenticated user
-    // const {
-    //   data: { user },
-    //   error: authError,
-    // } = await supabaseClient.auth.getUser();
-
-    // if (authError || !user) {
-    //   return new Response(
-    //     JSON.stringify({
-    //       error: {
-    //         message: "Nieprawidłowy lub wygasły token.",
-    //         code: "INVALID_AUTH_TOKEN",
-    //       },
-    //     }),
-    //     {
-    //       status: 401,
-    //       headers: { "Content-Type": "application/json" },
-    //     }
-    //   );
-    // }
-
-    // 4. Get roadmap details from Admin user
-    const roadmap = await roadmapService.getRoadmapDetails(roadmapId, userId);
+    // Get roadmap details for authenticated user
+    const roadmap = await roadmapService.getRoadmapDetails(roadmapId, user.id);
 
     if (!roadmap) {
       return new Response(

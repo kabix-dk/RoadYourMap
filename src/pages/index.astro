@@ -1,10 +1,57 @@
 ---
-import Welcome from "../components/Welcome.astro";
 import Layout from "../layouts/Layout.astro";
 
-return Astro.redirect("/auth/index");
+export const prerender = false;
+
+// Redirect logged in users to dashboard
+const { user } = Astro.locals;
+if (user) {
+  return Astro.redirect("/dashboard");
+}
 ---
 
-<Layout>
-  <Welcome />
+<Layout title="RoadYourMap - Twoja mapa do sukcesu w IT">
+  <div class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900">
+    <div class="container mx-auto px-4 py-16">
+      <div class="text-center">
+        <h1 class="text-5xl font-bold text-white mb-6">RoadYourMap</h1>
+        <p class="text-xl text-blue-200 mb-8 max-w-2xl mx-auto">
+          Automatycznie generuj spersonalizowane roadmapy nauki technologii IT. Planuj swoją ścieżkę rozwoju i śledź
+          postępy w nauce.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <a
+            href="/auth/register"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Rozpocznij za darmo
+          </a>
+          <a
+            href="/auth/login"
+            class="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-lg font-semibold transition-colors border border-white/20"
+          >
+            Zaloguj się
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-16 grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-3">🎯 Spersonalizowane roadmapy</h3>
+          <p class="text-blue-200">AI generuje plan nauki dostosowany do Twojego poziomu i celów</p>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-3">📈 Śledzenie postępów</h3>
+          <p class="text-blue-200">Oznaczaj ukończone etapy i monitoruj swój rozwój</p>
+        </div>
+
+        <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-lg p-6">
+          <h3 class="text-xl font-semibold text-white mb-3">✏️ Edytowalne plany</h3>
+          <p class="text-blue-200">Dostosuj roadmapę do swoich potrzeb i preferencji</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </Layout>

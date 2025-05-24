@@ -1,5 +1,42 @@
 import type { Tables, TablesInsert, TablesUpdate } from "./db/database.types";
 
+// ===== Auth DTOs and Commands =====
+
+// User-related types
+export interface User {
+  id: string;
+  email: string;
+  created_at: string;
+  last_sign_in_at?: string;
+}
+
+export interface AuthSession {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  user: User;
+}
+
+// Auth DTOs
+export interface LoginCommand {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCommand {
+  email: string;
+  password: string;
+}
+
+export interface ForgotPasswordCommand {
+  email: string;
+}
+
+export interface ResetPasswordCommand {
+  password: string;
+  token: string;
+}
+
 // Pagination metadata for list endpoints
 export interface PaginationMetaDto {
   limit: number;

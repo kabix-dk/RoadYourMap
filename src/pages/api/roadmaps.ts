@@ -1,16 +1,30 @@
 import type { APIRoute } from "astro";
 import { dashboardService } from "@/lib/services/dashboard.service";
-import { ADMIN_USER_ID } from "@/lib/utils";
 
 export const prerender = false;
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ locals }) => {
   try {
-    // Use admin user id from utils
-    const userId = ADMIN_USER_ID;
+    // Get authenticated user from middleware
+    const { user } = locals;
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: "Unauthorized",
+            code: "UNAUTHORIZED",
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
 
     // Fetch user's roadmaps
-    const roadmaps = await dashboardService.getUserRoadmaps(userId);
+    const roadmaps = await dashboardService.getUserRoadmaps(user.id);
 
     // Return successful response
     return new Response(JSON.stringify({ roadmaps }), {

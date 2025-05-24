@@ -62,17 +62,29 @@ export default function RegisterForm() {
     setErrors({});
 
     try {
-      // TODO: Implementacja rejestracji z Supabase
-      console.log("Register attempt:", {
-        email: formData.email,
-        password: formData.password,
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          confirmPassword: formData.confirmPassword,
+        }),
       });
 
-      // Symulacja opóźnienia API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const data = await response.json();
 
-      // TODO: Przekierowanie po udanej rejestracji
-      console.log("Registration successful");
+      if (!response.ok) {
+        setErrors({
+          general: data.error?.message || "Wystąpił błąd podczas rejestracji",
+        });
+        return;
+      }
+
+      // Redirect to dashboard on successful registration
+      window.location.href = "/dashboard";
     } catch {
       setErrors({
         general: "Wystąpił błąd podczas rejestracji. Spróbuj ponownie.",
@@ -100,19 +112,21 @@ export default function RegisterForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
-        <h2 className="text-2xl font-bold">Utwórz konto</h2>
-        <p className="text-muted-foreground">Wprowadź swoje dane, aby utworzyć nowe konto</p>
+        <h2 className="text-2xl font-bold text-white">Utwórz konto</h2>
+        <p className="text-blue-200">Wprowadź swoje dane, aby założyć nowe konto</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {errors.general && (
-          <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+          <div className="p-3 text-sm text-red-200 bg-red-900/20 border border-red-500/30 rounded-md">
             {errors.general}
           </div>
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="text-white">
+            Email
+          </Label>
           <Input
             id="email"
             type="email"
@@ -120,40 +134,50 @@ export default function RegisterForm() {
             value={formData.email}
             onChange={handleInputChange("email")}
             disabled={isLoading}
-            className={errors.email ? "border-destructive" : ""}
+            className={`bg-white/10 border-white/20 text-white placeholder:text-white/60 ${
+              errors.email ? "border-red-500" : ""
+            }`}
           />
-          {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
+          {errors.email && <p className="text-sm text-red-300">{errors.email}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password">Hasło</Label>
+          <Label htmlFor="password" className="text-white">
+            Hasło
+          </Label>
           <Input
             id="password"
             type="password"
-            placeholder="Wprowadź hasło (min. 6 znaków)"
+            placeholder="Wprowadź hasło"
             value={formData.password}
             onChange={handleInputChange("password")}
             disabled={isLoading}
-            className={errors.password ? "border-destructive" : ""}
+            className={`bg-white/10 border-white/20 text-white placeholder:text-white/60 ${
+              errors.password ? "border-red-500" : ""
+            }`}
           />
-          {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
+          {errors.password && <p className="text-sm text-red-300">{errors.password}</p>}
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Potwierdź hasło</Label>
+          <Label htmlFor="confirmPassword" className="text-white">
+            Potwierdź hasło
+          </Label>
           <Input
             id="confirmPassword"
             type="password"
-            placeholder="Wprowadź hasło ponownie"
+            placeholder="Potwierdź hasło"
             value={formData.confirmPassword}
             onChange={handleInputChange("confirmPassword")}
             disabled={isLoading}
-            className={errors.confirmPassword ? "border-destructive" : ""}
+            className={`bg-white/10 border-white/20 text-white placeholder:text-white/60 ${
+              errors.confirmPassword ? "border-red-500" : ""
+            }`}
           />
-          {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
+          {errors.confirmPassword && <p className="text-sm text-red-300">{errors.confirmPassword}</p>}
         </div>
 
-        <Button type="submit" className="w-full" disabled={isLoading}>
+        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={isLoading}>
           {isLoading ? (
             <>
               <Spinner className="mr-2 h-4 w-4" />
@@ -166,9 +190,9 @@ export default function RegisterForm() {
       </form>
 
       <div className="text-center">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-blue-200">
           Masz już konto?{" "}
-          <a href="/auth/login" className="text-foreground hover:underline font-medium">
+          <a href="/auth/login" className="text-white hover:underline font-medium">
             Zaloguj się
           </a>
         </p>

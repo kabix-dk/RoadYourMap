@@ -5,27 +5,43 @@ interface Props {
   title?: string;
 }
 
-const { title = "RoadYourMap" } = Astro.props;
+const { title = "RoadYourMap - Autentykacja" } = Astro.props;
+
+// Redirect logged in users to dashboard
+const { user } = Astro.locals;
+if (user && Astro.url.pathname.startsWith("/auth/")) {
+  return Astro.redirect("/dashboard");
+}
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="pl">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class="min-h-screen bg-background">
+  <body class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900">
     <div class="min-h-screen flex items-center justify-center p-4">
-      <div class="w-full max-w-md space-y-8">
-        <div class="text-center">
-          <h1 class="text-3xl font-bold text-foreground">RoadYourMap</h1>
-          <p class="mt-2 text-sm text-muted-foreground">Plan your learning journey</p>
+      <div class="w-full max-w-md">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold text-white mb-2">RoadYourMap</h1>
+          <p class="text-blue-200">Twoja mapa do sukcesu w IT</p>
         </div>
+
         <slot />
       </div>
     </div>
   </body>
 </html>
+
+<style>
+  html,
+  body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>
