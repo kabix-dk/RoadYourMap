@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import RoadmapListContainer from "../components/dashboard/RoadmapListContainer";
 
 export const prerender = false;
 
@@ -36,9 +37,10 @@ const { user } = Astro.locals;
               </a>
             </div>
           </div>
-          <p class="text-blue-200">
-            Tutaj będą wyświetlane Twoje roadmapy nauki. Funkcjonalność zostanie wkrótce dodana.
-          </p>
+
+          <div class="dark">
+            <RoadmapListContainer client:load />
+          </div>
         </div>
       </div>
     </div>

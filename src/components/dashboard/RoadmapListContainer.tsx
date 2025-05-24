@@ -65,7 +65,7 @@ export default function RoadmapListContainer() {
           onClick={() => navigate("/dashboard")}
           className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
         >
-          Try Again
+          Spróbuj ponownie
         </button>
       </div>
     );
@@ -74,12 +74,12 @@ export default function RoadmapListContainer() {
   if (roadmaps.length === 0) {
     return (
       <div className="text-center py-8">
-        <p className="text-muted-foreground">You don&apos;t have any roadmaps yet.</p>
+        <p className="text-muted-foreground">Nie masz jeszcze żadnych roadmap.</p>
         <a
           href="/roadmaps/create"
           className="mt-4 inline-block px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
         >
-          Create Your First Roadmap
+          Utwórz swoją pierwszą roadmapę
         </a>
       </div>
     );
