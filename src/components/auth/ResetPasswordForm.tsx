@@ -3,11 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-
-interface ResetPasswordFormData {
-  password: string;
-  confirmPassword: string;
-}
+import { resetPasswordSchema, type ResetPasswordFormData } from "../../lib/auth/validation";
 
 interface ResetPasswordFormErrors {
   password?: string;
@@ -22,25 +18,24 @@ export default function ResetPasswordForm() {
   });
   const [errors, setErrors] = useState<ResetPasswordFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const validateForm = (): boolean => {
-    const newErrors: ResetPasswordFormErrors = {};
+    const validationResult = resetPasswordSchema.safeParse(formData);
 
-    if (!formData.password) {
-      newErrors.password = "Hasło jest wymagane";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Hasło musi mieć co najmniej 6 znaków";
+    if (!validationResult.success) {
+      const newErrors: ResetPasswordFormErrors = {};
+      validationResult.error.errors.forEach((error) => {
+        const field = error.path[0] as keyof ResetPasswordFormErrors;
+        if (field in newErrors) {
+          newErrors[field] = error.message;
+        }
+      });
+      setErrors(newErrors);
+      return false;
     }
 
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Potwierdzenie hasła jest wymagane";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Hasła nie są identyczne";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors({});
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,13 +49,25 @@ export default function ResetPasswordForm() {
     setErrors({});
 
     try {
-      // TODO: Implementacja resetowania hasła z Supabase
-      console.log("Reset password attempt");
+      const response = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-      // Symulacja opóźnienia API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const data = await response.json();
 
-      setIsSuccess(true);
+      if (!response.ok) {
+        setErrors({
+          general: data.error?.message || "Wystąpił błąd podczas resetowania hasła",
+        });
+        return;
+      }
+
+      // Redirect to dashboard after successful password reset
+      window.location.href = "/dashboard";
     } catch {
       setErrors({
         general: "Wystąpił błąd podczas resetowania hasła. Spróbuj ponownie.",
@@ -76,7 +83,7 @@ export default function ResetPasswordForm() {
       [field]: e.target.value,
     }));
 
-    // Wyczyść błąd dla tego pola
+    // Clear error for this field when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
@@ -84,27 +91,6 @@ export default function ResetPasswordForm() {
       }));
     }
   };
-
-  if (isSuccess) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-2 text-center">
-          <h2 className="text-2xl font-bold">Hasło zostało zmienione</h2>
-          <p className="text-muted-foreground">
-            Twoje hasło zostało pomyślnie zaktualizowane. Możesz się teraz zalogować.
-          </p>
-        </div>
-
-        <div className="p-4 text-sm bg-green-50 border border-green-200 rounded-md text-green-800">
-          <p>Hasło zostało pomyślnie zresetowane.</p>
-        </div>
-
-        <Button asChild className="w-full">
-          <a href="/auth/login">Przejdź do logowania</a>
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">

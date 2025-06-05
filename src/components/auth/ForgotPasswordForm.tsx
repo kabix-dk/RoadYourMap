@@ -3,10 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
-
-interface ForgotPasswordFormData {
-  email: string;
-}
+import { forgotPasswordSchema, type ForgotPasswordFormData } from "../../lib/auth/validation";
 
 interface ForgotPasswordFormErrors {
   email?: string;
@@ -19,19 +16,23 @@ export default function ForgotPasswordForm() {
   });
   const [errors, setErrors] = useState<ForgotPasswordFormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
 
   const validateForm = (): boolean => {
-    const newErrors: ForgotPasswordFormErrors = {};
+    const validationResult = forgotPasswordSchema.safeParse(formData);
 
-    if (!formData.email) {
-      newErrors.email = "Email jest wymagany";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Nieprawidłowy format email";
+    if (!validationResult.success) {
+      const newErrors: ForgotPasswordFormErrors = {};
+      validationResult.error.errors.forEach((error) => {
+        if (error.path[0] === "email") {
+          newErrors.email = error.message;
+        }
+      });
+      setErrors(newErrors);
+      return false;
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors({});
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,13 +46,25 @@ export default function ForgotPasswordForm() {
     setErrors({});
 
     try {
-      // TODO: Implementacja odzyskiwania hasła z Supabase
-      console.log("Forgot password attempt:", formData);
+      const response = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
-      // Symulacja opóźnienia API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const data = await response.json();
 
-      setIsSuccess(true);
+      if (!response.ok) {
+        setErrors({
+          general: data.error?.message || "Wystąpił błąd podczas wysyłania emaila",
+        });
+        return;
+      }
+
+      // Redirect to home page after successful email send
+      window.location.href = "/";
     } catch {
       setErrors({
         general: "Wystąpił błąd podczas wysyłania emaila. Spróbuj ponownie.",
@@ -64,7 +77,7 @@ export default function ForgotPasswordForm() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ email: e.target.value });
 
-    // Wyczyść błąd
+    // Clear error when user starts typing
     if (errors.email) {
       setErrors((prev) => ({
         ...prev,
@@ -72,31 +85,6 @@ export default function ForgotPasswordForm() {
       }));
     }
   };
-
-  if (isSuccess) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-2 text-center">
-          <h2 className="text-2xl font-bold">Email wysłany</h2>
-          <p className="text-muted-foreground">
-            Sprawdź swoją skrzynkę pocztową i kliknij w link, aby zresetować hasło.
-          </p>
-        </div>
-
-        <div className="p-4 text-sm bg-green-50 border border-green-200 rounded-md text-green-800">
-          <p>
-            Wysłaliśmy instrukcje resetowania hasła na adres <strong>{formData.email}</strong>
-          </p>
-        </div>
-
-        <div className="text-center">
-          <a href="/auth/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-            Powrót do logowania
-          </a>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
