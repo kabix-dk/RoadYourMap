@@ -1,0 +1,23 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import RoadmapDetailsView from "@/components/views/RoadmapDetailsView";
+
+export const prerender = false;
+
+// Pobierz parametr id z URL
+const { id } = Astro.params;
+
+// Sprawdź czy użytkownik jest zalogowany
+if (!Astro.locals.user) {
+  return Astro.redirect("/auth/login");
+}
+
+// Podstawowa walidacja formatu UUID
+if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+  return new Response("Invalid roadmap ID format", { status: 400 });
+}
+---
+
+<Layout title="Szczegóły Roadmapy - RoadYourMap">
+  <RoadmapDetailsView roadmapId={id} client:load />
+</Layout>
