@@ -52,6 +52,11 @@ export type RoadmapSummaryDto = Pick<
   "id" | "title" | "experience_level" | "technology" | "goals" | "created_at" | "updated_at"
 >;
 
+// Roadmap summary with progress calculation for dashboard
+export interface RoadmapSummaryWithProgressDto extends RoadmapSummaryDto {
+  progress: number;
+}
+
 // Response shape for GET /api/roadmaps
 export interface RoadmapListResponseDto {
   data: RoadmapSummaryDto[];

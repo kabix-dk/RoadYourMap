@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import type { RoadmapSummaryDto } from "../../types";
+import type { RoadmapSummaryWithProgressDto } from "../../types";
 
 interface UseRoadmapsReturn {
-  roadmaps: RoadmapSummaryDto[];
+  roadmaps: RoadmapSummaryWithProgressDto[];
   isLoading: boolean;
   error: string | null;
   fetchRoadmaps: () => Promise<void>;
@@ -10,7 +10,7 @@ interface UseRoadmapsReturn {
 }
 
 export function useRoadmaps(): UseRoadmapsReturn {
-  const [roadmaps, setRoadmaps] = useState<RoadmapSummaryDto[]>([]);
+  const [roadmaps, setRoadmaps] = useState<RoadmapSummaryWithProgressDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 

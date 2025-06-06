@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { RoadmapSummaryDto } from "../../types";
+import type { RoadmapSummaryWithProgressDto } from "../../types";
 import { useRoadmaps } from "../../lib/hooks/useRoadmaps";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import RoadmapCard from "./RoadmapCard";
@@ -29,7 +29,7 @@ export default function RoadmapListContainer() {
     [navigate]
   );
 
-  const handleDeleteClick = useCallback((roadmap: RoadmapSummaryDto) => {
+  const handleDeleteClick = useCallback((roadmap: RoadmapSummaryWithProgressDto) => {
     setRoadmapToDelete({ id: roadmap.id, title: roadmap.title });
   }, []);
 

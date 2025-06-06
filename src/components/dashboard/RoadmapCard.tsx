@@ -1,13 +1,13 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Progress } from "../../components/ui/progress";
-import type { RoadmapSummaryDto } from "../../types";
+import type { RoadmapSummaryWithProgressDto } from "../../types";
 
 interface RoadmapCardProps {
-  roadmap: RoadmapSummaryDto;
+  roadmap: RoadmapSummaryWithProgressDto;
   onPreview: (roadmapId: string) => void;
   onEdit: (roadmapId: string) => void;
-  onDelete: (roadmap: RoadmapSummaryDto) => void;
+  onDelete: (roadmap: RoadmapSummaryWithProgressDto) => void;
 }
 
 export default function RoadmapCard({ roadmap, onPreview, onEdit, onDelete }: RoadmapCardProps) {
@@ -17,8 +17,8 @@ export default function RoadmapCard({ roadmap, onPreview, onEdit, onDelete }: Ro
     day: "numeric",
   });
 
-  // TODO: Replace with actual progress calculation once backend provides it
-  const progressPercentage = 69;
+  // Use the actual progress calculated by the backend, rounded to whole number
+  const progressPercentage = Math.round(roadmap.progress);
 
   return (
     <Card>
