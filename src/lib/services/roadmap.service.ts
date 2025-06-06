@@ -241,4 +241,141 @@ export class RoadmapService {
       };
     }
   }
+
+  /**
+   * Updates a roadmap item along with all its children when completion status changes
+   * @param supabase - Supabase client instance from server context
+   * @param roadmapId - UUID of the roadmap containing the item
+   * @param itemId - UUID of the item to update
+   * @param requestBody - Raw request body to validate
+   * @returns UpdateItemResult indicating success or failure with updated data
+   */
+  async updateRoadmapItemWithChildren(
+    supabase: SupabaseServerClient,
+    roadmapId: string,
+    itemId: string,
+    requestBody: unknown
+  ): Promise<UpdateItemResult> {
+    try {
+      // Validate request body
+      const validation = UpdateRoadmapItemSchema.safeParse(requestBody);
+      if (!validation.success) {
+        return {
+          success: false,
+          status: 400,
+          error: "Validation failed: " + validation.error.errors.map((e) => e.message).join(", "),
+        };
+      }
+
+      const updateData: UpdateRoadmapItemCommand = validation.data;
+
+      // Log the operation attempt
+      console.log(`Attempting to update item ${itemId} with children in roadmap ${roadmapId}`);
+
+      // First verify that the roadmap exists and user has access (RLS will handle this)
+      const { data: roadmap, error: roadmapError } = await supabase
+        .from("roadmaps")
+        .select("id")
+        .eq("id", roadmapId)
+        .single();
+
+      if (roadmapError || !roadmap) {
+        console.warn(`Roadmap ${roadmapId} not found or user not authorized`);
+        return {
+          success: false,
+          status: 404,
+          error: "Roadmap not found or user not authorized",
+        };
+      }
+
+      // If we're updating completion status, we need to update children too
+      if (updateData.is_completed !== undefined) {
+        // Get all children of this item recursively
+        const { data: allItems, error: itemsError } = await supabase
+          .from("roadmap_items")
+          .select("id, parent_item_id")
+          .eq("roadmap_id", roadmapId);
+
+        if (itemsError) {
+          console.error(`Error fetching roadmap items:`, itemsError);
+          return {
+            success: false,
+            status: 500,
+            error: "Database error occurred while fetching items",
+          };
+        }
+
+        // Find all children recursively
+        const findAllChildren = (
+          parentId: string,
+          items: { id: string; parent_item_id: string | null }[]
+        ): string[] => {
+          const directChildren = items.filter((item) => item.parent_item_id === parentId);
+          const allChildren = [...directChildren.map((child) => child.id)];
+
+          directChildren.forEach((child) => {
+            allChildren.push(...findAllChildren(child.id, items));
+          });
+
+          return allChildren;
+        };
+
+        const childrenIds = findAllChildren(itemId, allItems || []);
+        const allItemsToUpdate = [itemId, ...childrenIds];
+
+        // Prepare update data with special logic for completion status
+        const updatePayload: UpdateRoadmapItemCommand & { completed_at?: string | null } = { ...updateData };
+
+        // Handle completed_at timestamp logic
+        if (updateData.is_completed) {
+          // Set completed_at to current timestamp when marking as completed
+          updatePayload.completed_at = new Date().toISOString();
+        } else {
+          // Clear completed_at when marking as not completed
+          updatePayload.completed_at = null;
+        }
+
+        // Update all items (parent and children) in a single transaction
+        const { data: updatedItems, error: updateError } = await supabase
+          .from("roadmap_items")
+          .update(updatePayload)
+          .eq("roadmap_id", roadmapId)
+          .in("id", allItemsToUpdate)
+          .select("*");
+
+        if (updateError) {
+          console.error(`Database error updating items:`, updateError);
+          return {
+            success: false,
+            status: 500,
+            error: "Database error occurred while updating items",
+          };
+        }
+
+        if (!updatedItems || updatedItems.length === 0) {
+          return {
+            success: false,
+            status: 404,
+            error: "Roadmap items not found",
+          };
+        }
+
+        console.log(`Successfully updated ${updatedItems.length} items`);
+        return {
+          success: true,
+          data: updatedItems[0] as RoadmapItemRecordDto, // Return the main item (first in array)
+        };
+      } else {
+        // If not updating completion status, just update the single item
+        return this.updateRoadmapItem(supabase, roadmapId, itemId, requestBody);
+      }
+    } catch (error) {
+      console.error(`Unexpected error in updateRoadmapItemWithChildren for item ${itemId}:`, error);
+      return {
+        success: false,
+        status: 500,
+        error: "An unexpected error occurred while updating items",
+      };
+    }
+  }
 }

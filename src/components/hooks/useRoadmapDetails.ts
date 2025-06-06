@@ -83,9 +83,9 @@ export function useRoadmapDetails(roadmapId: string): UseRoadmapDetailsReturn {
       setProgress(newProgress);
 
       try {
-        // Wyślij żądanie do API
+        // Wyślij żądanie do API - używamy PUT dla aktualizacji z pod-elementami
         const response = await fetch(`/api/roadmaps/${roadmapId}/items/${itemId}`, {
-          method: "PATCH",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },

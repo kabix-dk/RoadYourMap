@@ -87,6 +87,8 @@ export function calculateProgress(items: RoadmapItemViewModel[]): number {
 
 /**
  * Aktualizuje status ukończenia elementu w drzewie (immutable)
+ * Gdy element zostaje oznaczony jako ukończony, wszystkie jego pod-elementy również zostają ukończone
+ * Gdy element zostaje odznaczony, wszystkie jego pod-elementy również zostają odznaczone
  */
 export function updateItemCompletionStatus(
   items: RoadmapItemViewModel[],
@@ -95,10 +97,21 @@ export function updateItemCompletionStatus(
 ): RoadmapItemViewModel[] {
   return items.map((item) => {
     if (item.id === itemId) {
+      // Funkcja pomocnicza do rekurencyjnego aktualizowania wszystkich pod-elementów
+      const updateChildrenRecursively = (children: RoadmapItemViewModel[]): RoadmapItemViewModel[] => {
+        return children.map((child) => ({
+          ...child,
+          is_completed: isCompleted,
+          completed_at: isCompleted ? new Date().toISOString() : null,
+          children: updateChildrenRecursively(child.children),
+        }));
+      };
+
       return {
         ...item,
         is_completed: isCompleted,
         completed_at: isCompleted ? new Date().toISOString() : null,
+        children: updateChildrenRecursively(item.children),
       };
     }
 

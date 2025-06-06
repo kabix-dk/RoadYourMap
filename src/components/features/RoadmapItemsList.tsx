@@ -1,6 +1,6 @@
 import React from "react";
 import type { RoadmapItemViewModel } from "@/components/views/RoadmapDetailsView.types";
-import RoadmapItem from "./RoadmapItem";
+import RoadmapItem from "@/components/features/RoadmapItem";
 
 interface RoadmapItemsListProps {
   items: RoadmapItemViewModel[];
