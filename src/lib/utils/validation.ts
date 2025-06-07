@@ -38,3 +38,12 @@ export const CreateRoadmapItemSchema = z.object({
   level: z.number().int().min(0, "Level must be a non-negative integer"),
   position: z.number().int().min(0, "Position must be a non-negative integer"),
 });
+
+/**
+ * Zod schema for validating roadmap and item ID parameters from URL path
+ * Both must be valid UUIDs
+ */
+export const RoadmapItemParamsSchema = z.object({
+  roadmapId: z.string().uuid("Roadmap ID must be a valid UUID"),
+  itemId: z.string().uuid("Item ID must be a valid UUID"),
+});

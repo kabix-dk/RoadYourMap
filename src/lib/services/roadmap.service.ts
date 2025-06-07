@@ -501,4 +501,71 @@ export class RoadmapService {
       };
     }
   }
+
+  /**
+   * Deletes a roadmap item and its children (cascade delete)
+   * @param supabase - Supabase client instance from server context
+   * @param roadmapId - UUID of the roadmap containing the item
+   * @param itemId - UUID of the item to delete
+   * @returns DeleteResult indicating success or failure with status and error message
+   */
+  async deleteRoadmapItem(supabase: SupabaseServerClient, roadmapId: string, itemId: string): Promise<DeleteResult> {
+    try {
+      // Log the operation attempt
+      console.log(`Attempting to delete item ${itemId} from roadmap ${roadmapId}`);
+
+      // First verify that the roadmap exists and user has access (RLS will handle this)
+      const { data: roadmap, error: roadmapError } = await supabase
+        .from("roadmaps")
+        .select("id")
+        .eq("id", roadmapId)
+        .single();
+
+      if (roadmapError || !roadmap) {
+        console.warn(`Roadmap ${roadmapId} not found or user not authorized`);
+        return {
+          success: false,
+          status: 404,
+          error: "Roadmap not found or user not authorized",
+        };
+      }
+
+      // Delete the item with RLS policy ensuring user access
+      // ON DELETE CASCADE will automatically delete all child items
+      const { error: deleteError, count } = await supabase
+        .from("roadmap_items")
+        .delete()
+        .eq("id", itemId)
+        .eq("roadmap_id", roadmapId);
+
+      if (deleteError) {
+        console.error(`Database error deleting item ${itemId}:`, deleteError);
+        return {
+          success: false,
+          status: 500,
+          error: "Database error occurred while deleting item",
+        };
+      }
+
+      // Check if any rows were affected
+      if (count === 0) {
+        console.warn(`Item ${itemId} not found in roadmap ${roadmapId} or user not authorized`);
+        return {
+          success: false,
+          status: 404,
+          error: "Roadmap item not found",
+        };
+      }
+
+      console.log(`Successfully deleted item ${itemId} from roadmap ${roadmapId}`);
+      return { success: true };
+    } catch (error) {
+      console.error(`Unexpected error in deleteRoadmapItem for item ${itemId}:`, error);
+      return {
+        success: false,
+        status: 500,
+        error: "An unexpected error occurred while deleting item",
+      };
+    }
+  }
 }

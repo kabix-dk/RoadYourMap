@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { isValidUUID } from "@/lib/utils/validation";
+import { isValidUUID, RoadmapItemParamsSchema } from "@/lib/utils/validation";
 import { RoadmapService } from "@/lib/services/roadmap.service";
 
 const roadmapService = new RoadmapService();
@@ -223,6 +223,86 @@ export const PUT: APIRoute = async ({ params, request, locals }) => {
     });
   } catch (error) {
     console.error("Error in PUT /api/roadmaps/[roadmapId]/items/[itemId]:", error);
+    return new Response(
+      JSON.stringify({
+        error: {
+          message: "Internal server error",
+          code: "INTERNAL_SERVER_ERROR",
+        },
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+};
+
+export const DELETE: APIRoute = async ({ params, locals }) => {
+  try {
+    // Get authenticated user and supabase client from middleware
+    const { user, supabase } = locals;
+
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: "Authorization token required",
+            code: "UNAUTHORIZED",
+          },
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Validate path parameters using Zod schema
+    const paramsValidation = RoadmapItemParamsSchema.safeParse(params);
+    if (!paramsValidation.success) {
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: "Invalid path parameters: " + paramsValidation.error.errors.map((e) => e.message).join(", "),
+            code: "INVALID_PARAMS",
+          },
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const { roadmapId, itemId } = paramsValidation.data;
+
+    // Delete roadmap item using service
+    const result = await roadmapService.deleteRoadmapItem(supabase, roadmapId, itemId);
+
+    // Handle service response
+    if (!result.success) {
+      const statusCode = result.status || 500;
+      const errorMessage = result.error || "An unexpected error occurred";
+
+      return new Response(
+        JSON.stringify({
+          error: {
+            message: errorMessage,
+            code: statusCode === 404 ? "NOT_FOUND" : "INTERNAL_SERVER_ERROR",
+          },
+        }),
+        {
+          status: statusCode,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Return success with no content
+    return new Response(null, { status: 204 });
+  } catch (error) {
+    console.error("Error in DELETE /api/roadmaps/[roadmapId]/items/[itemId]:", error);
     return new Response(
       JSON.stringify({
         error: {
