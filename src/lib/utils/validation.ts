@@ -25,3 +25,16 @@ export const UpdateRoadmapItemSchema = z
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one field must be provided for update",
   });
+
+/**
+ * Zod schema for validating create roadmap item request body
+ * Required fields: title, level, position
+ * Optional fields: parent_item_id, description
+ */
+export const CreateRoadmapItemSchema = z.object({
+  parent_item_id: z.string().uuid("Parent item ID must be a valid UUID").nullable().optional(),
+  title: z.string().min(1, "Title is required and must not be empty"),
+  description: z.string().optional(),
+  level: z.number().int().min(0, "Level must be a non-negative integer"),
+  position: z.number().int().min(0, "Position must be a non-negative integer"),
+});

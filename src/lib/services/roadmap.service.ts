@@ -6,6 +6,7 @@ import type {
   RoadmapItemDto,
   UpdateRoadmapItemCommand,
   RoadmapItemRecordDto,
+  CreateRoadmapItemCommand,
 } from "../../types";
 
 interface DeleteResult {
@@ -15,6 +16,13 @@ interface DeleteResult {
 }
 
 interface UpdateItemResult {
+  success: boolean;
+  data?: RoadmapItemRecordDto;
+  status?: number;
+  error?: string;
+}
+
+interface CreateItemResult {
   success: boolean;
   data?: RoadmapItemRecordDto;
   status?: number;
@@ -375,6 +383,121 @@ export class RoadmapService {
         success: false,
         status: 500,
         error: "An unexpected error occurred while updating items",
+      };
+    }
+  }
+
+  /**
+   * Creates a new roadmap item
+   * @param supabase - Supabase client instance from server context
+   * @param roadmapId - UUID of the roadmap to add the item to
+   * @param createCommand - Validated create command data
+   * @returns CreateItemResult indicating success or failure with created data
+   */
+  async createRoadmapItem(
+    supabase: SupabaseServerClient,
+    roadmapId: string,
+    createCommand: CreateRoadmapItemCommand
+  ): Promise<CreateItemResult> {
+    try {
+      // Log the operation attempt
+      console.log(`Attempting to create item in roadmap ${roadmapId}`);
+
+      // First verify that the roadmap exists and user has access (RLS will handle this)
+      const { data: roadmap, error: roadmapError } = await supabase
+        .from("roadmaps")
+        .select("id")
+        .eq("id", roadmapId)
+        .single();
+
+      if (roadmapError || !roadmap) {
+        console.warn(`Roadmap ${roadmapId} not found or user not authorized`);
+        return {
+          success: false,
+          status: 404,
+          error: "Roadmap not found or user not authorized",
+        };
+      }
+
+      // If parent_item_id is provided, verify it exists in the same roadmap
+      if (createCommand.parent_item_id) {
+        const { data: parentItem, error: parentError } = await supabase
+          .from("roadmap_items")
+          .select("id")
+          .eq("id", createCommand.parent_item_id)
+          .eq("roadmap_id", roadmapId)
+          .single();
+
+        if (parentError || !parentItem) {
+          console.warn(`Parent item ${createCommand.parent_item_id} not found in roadmap ${roadmapId}`);
+          return {
+            success: false,
+            status: 404,
+            error: "Parent item not found in this roadmap",
+          };
+        }
+      }
+
+      // Prepare insert data
+      const insertData = {
+        roadmap_id: roadmapId,
+        parent_item_id: createCommand.parent_item_id || null,
+        title: createCommand.title,
+        description: createCommand.description || null,
+        level: createCommand.level,
+        position: createCommand.position,
+        is_completed: false,
+        completed_at: null,
+      };
+
+      // Insert the new item
+      const { data: newItem, error: insertError } = await supabase
+        .from("roadmap_items")
+        .insert(insertData)
+        .select("*")
+        .single();
+
+      if (insertError) {
+        console.error(`Database error creating item in roadmap ${roadmapId}:`, insertError);
+
+        // Handle unique constraint violation (duplicate position)
+        if (
+          insertError.code === "23505" &&
+          insertError.message?.includes("roadmap_items_roadmap_id_parent_item_id_position_key")
+        ) {
+          return {
+            success: false,
+            status: 400,
+            error: "An item with this position already exists at this level",
+          };
+        }
+
+        return {
+          success: false,
+          status: 500,
+          error: "Database error occurred while creating item",
+        };
+      }
+
+      if (!newItem) {
+        return {
+          success: false,
+          status: 500,
+          error: "Failed to create item",
+        };
+      }
+
+      console.log(`Successfully created item ${newItem.id} in roadmap ${roadmapId}`);
+      return {
+        success: true,
+        data: newItem as RoadmapItemRecordDto,
+      };
+    } catch (error) {
+      console.error(`Unexpected error in createRoadmapItem for roadmap ${roadmapId}:`, error);
+      return {
+        success: false,
+        status: 500,
+        error: "An unexpected error occurred while creating item",
       };
     }
   }
