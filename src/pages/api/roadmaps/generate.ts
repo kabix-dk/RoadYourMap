@@ -89,12 +89,13 @@ export const POST: APIRoute = async ({ request, locals, cookies }) => {
       roadmap_id: roadmap.id,
       position: (index + 1) * 1000, // Gap-based ordering
     }));
-
+    console.log("roadmapItems", roadmapItems);
     const { error: itemsError } = await supabase.from("roadmap_items").insert(roadmapItems);
 
     if (itemsError) {
       // Rollback by deleting the roadmap if items insertion fails
       await supabase.from("roadmaps").delete().eq("id", roadmap.id);
+      console.log("itemsError", itemsError);
       return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
     }
 

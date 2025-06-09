@@ -26,7 +26,7 @@ type CreateRoadmapFormData = z.infer<typeof createRoadmapFormSchema>;
 const InlineErrorMessage = ({ message }: { message?: string }) => {
   if (!message) return null;
   return (
-    <p className="text-sm text-red-500 mt-1" role="alert">
+    <p className="text-sm text-red-300 mt-1" role="alert">
       {message}
     </p>
   );
@@ -71,69 +71,92 @@ export default function RoadmapCreationForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
       {apiError && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-md" role="alert">
-          <p className="text-sm text-red-600">{apiError}</p>
+        <div className="p-3 text-sm text-red-200 bg-red-900/20 border border-red-500/30 rounded-md" role="alert">
+          {apiError}
         </div>
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="title">Tytuł Roadmapy</Label>
+        <Label htmlFor="title" className="text-white">
+          Tytuł Roadmapy
+        </Label>
         <Input
           id="title"
           {...register("title")}
           placeholder="Wprowadź tytuł roadmapy"
           aria-describedby={errors.title ? "title-error" : undefined}
+          className={`bg-white/10 border-white/20 text-white placeholder:text-white/60 ${
+            errors.title ? "border-red-500" : ""
+          }`}
         />
         <InlineErrorMessage message={errors.title?.message} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="experience_level">Poziom Doświadczenia</Label>
+        <Label htmlFor="experience_level" className="text-white">
+          Poziom Doświadczenia
+        </Label>
         <Input
           id="experience_level"
           {...register("experience_level")}
           placeholder="Np. Junior, Mid, Senior"
           aria-describedby={errors.experience_level ? "experience-level-error" : undefined}
+          className={`bg-white/10 border-white/20 text-white placeholder:text-white/60 ${
+            errors.experience_level ? "border-red-500" : ""
+          }`}
         />
         <InlineErrorMessage message={errors.experience_level?.message} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="technology">Technologia</Label>
+        <Label htmlFor="technology" className="text-white">
+          Technologia
+        </Label>
         <Input
           id="technology"
           {...register("technology")}
           placeholder="Np. React, Python, Java"
           aria-describedby={errors.technology ? "technology-error" : undefined}
+          className={`bg-white/10 border-white/20 text-white placeholder:text-white/60 ${
+            errors.technology ? "border-red-500" : ""
+          }`}
         />
         <InlineErrorMessage message={errors.technology?.message} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="goals">Cele Nauki</Label>
+        <Label htmlFor="goals" className="text-white">
+          Cele Nauki
+        </Label>
         <Textarea
           id="goals"
           {...register("goals")}
           placeholder="Opisz swoje cele nauki"
-          className="min-h-[100px]"
+          className={`min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/60 ${
+            errors.goals ? "border-red-500" : ""
+          }`}
           aria-describedby={errors.goals ? "goals-error" : undefined}
         />
         <InlineErrorMessage message={errors.goals?.message} />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="additional_info">Dodatkowe Informacje (opcjonalne)</Label>
+        <Label htmlFor="additional_info" className="text-white">
+          Dodatkowe Informacje (opcjonalne)
+        </Label>
         <Textarea
           id="additional_info"
           {...register("additional_info")}
           placeholder="Wprowadź dodatkowe informacje"
-          className="min-h-[100px]"
+          className={`min-h-[100px] bg-white/10 border-white/20 text-white placeholder:text-white/60 ${
+            errors.additional_info ? "border-red-500" : ""
+          }`}
           aria-describedby={errors.additional_info ? "additional-info-error" : undefined}
         />
         <InlineErrorMessage message={errors.additional_info?.message} />
       </div>
 
-      <Button type="submit" disabled={isSubmitting} className="w-full" aria-busy={isSubmitting}>
+      <Button type="submit" disabled={isSubmitting} className="w-full hover:cursor-pointer" aria-busy={isSubmitting}>
         {isSubmitting ? (
           <>
             <Spinner className="mr-2" />
