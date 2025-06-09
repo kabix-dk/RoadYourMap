@@ -124,8 +124,8 @@ function RoadmapEditorContent({ initialData }: { initialData: RoadmapDetailsDto 
   };
 
   // Obsługa zmiany kolejności
-  const handleReorder = async (activeId: string, overId: string | null, newIndex: number) => {
-    await actions.reorderItems(activeId, overId, newIndex);
+  const handleMoveItem = async (itemId: string, direction: "up" | "down") => {
+    await actions.moveItem(itemId, direction);
   };
 
   // Stan ładowania
@@ -207,7 +207,7 @@ function RoadmapEditorContent({ initialData }: { initialData: RoadmapDetailsDto 
         <div className="p-6">
           <RoadmapTree
             items={nestedItems}
-            onReorder={handleReorder}
+            onMoveItem={handleMoveItem}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
             onAdd={handleAdd}
@@ -222,7 +222,7 @@ function RoadmapEditorContent({ initialData }: { initialData: RoadmapDetailsDto 
           <h4 className="font-medium text-blue-200 mb-2">💡 Wskazówki:</h4>
           <ul className="space-y-1 text-blue-100">
             <li>• Kliknij na tytuł lub opis, aby edytować tekst</li>
-            <li>• Przeciągnij elementy za pomocą uchwytu, aby zmienić kolejność</li>
+            <li>• Użyj strzałek, aby zmienić kolejność elementów</li>
             <li>• Użyj checkboxa, aby oznaczyć element jako ukończony</li>
             <li>• Wszystkie zmiany są automatycznie zapisywane</li>
           </ul>

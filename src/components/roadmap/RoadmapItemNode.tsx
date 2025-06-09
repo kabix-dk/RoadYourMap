@@ -97,7 +97,7 @@ export function RoadmapItemNode({
             initialValue={item.title}
             onSave={(newTitle) => onTitleUpdate(item.id, newTitle)}
             validate={validateTitle}
-            className="font-medium"
+            className="font-medium text-gray-900 dark:text-white"
           />
 
           <InlineTextEdit

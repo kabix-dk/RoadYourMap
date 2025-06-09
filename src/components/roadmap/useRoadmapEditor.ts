@@ -39,29 +39,6 @@ function buildNestedItems(flatItems: RoadmapItemDto[]): RoadmapItemViewModel[] {
   return rootItems;
 }
 
-/**
- * Oblicza nową pozycję dla elementu na podstawie operacji drag-and-drop
- */
-function calculateNewPosition(
-  flatItems: RoadmapItemDto[],
-  activeId: string,
-  overId: string | null,
-  newIndex: number
-): { position: number; parent_item_id: string | null; level: number } {
-  // Implementacja będzie dodana w kolejnych krokach
-  // Na razie zwracamy podstawowe wartości
-  const activeItem = flatItems.find((item) => item.id === activeId);
-  if (!activeItem) {
-    throw new Error("Active item not found");
-  }
-
-  return {
-    position: newIndex,
-    parent_item_id: activeItem.parent_item_id,
-    level: activeItem.level,
-  };
-}
-
 export function useRoadmapEditor(initialData: RoadmapDetailsDto) {
   const [state, setState] = useState<RoadmapEditorState>({
     flatItems: initialData.items,
@@ -228,46 +205,71 @@ export function useRoadmapEditor(initialData: RoadmapDetailsDto) {
       [initialData.id, state.flatItems, updateState, performOptimisticUpdate]
     ),
 
-    reorderItems: useCallback(
-      async (activeId, overId, newIndex) => {
-        updateState({ isLoading: true });
+    moveItem: useCallback(
+      async (itemId: string, direction: "up" | "down") => {
+        updateState({ isLoading: true, error: null });
 
-        try {
-          const { position, parent_item_id, level } = calculateNewPosition(state.flatItems, activeId, overId, newIndex);
+        const originalItems = [...state.flatItems];
 
-          await performOptimisticUpdate(
-            () =>
-              state.flatItems.map((item) =>
-                item.id === activeId ? { ...item, position, parent_item_id, level } : item
-              ),
-            async () => {
-              const updateCommand: UpdateRoadmapItemCommand = {
-                position,
-                level,
-              };
-
-              const response = await fetch(`/api/roadmaps/${initialData.id}/items/${activeId}`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(updateCommand),
-              });
-
-              if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-              }
-
-              return await response.json();
-            }
-          );
-        } catch (error) {
-          updateState({
-            error: error instanceof Error ? error.message : "Błąd podczas zmiany kolejności",
-          });
+        const movingItem = originalItems.find((item) => item.id === itemId);
+        if (!movingItem) {
+          updateState({ isLoading: false, error: "Nie znaleziono elementu do przesunięcia." });
+          return;
         }
 
-        updateState({ isLoading: false });
+        const siblings = originalItems
+          .filter((item) => item.parent_item_id === movingItem.parent_item_id)
+          .sort((a, b) => a.position - b.position);
+
+        const siblingIndex = siblings.findIndex((item) => item.id === itemId);
+
+        const swappedItem =
+          direction === "up" && siblingIndex > 0
+            ? siblings[siblingIndex - 1]
+            : direction === "down" && siblingIndex < siblings.length - 1
+              ? siblings[siblingIndex + 1]
+              : null;
+
+        if (!swappedItem) {
+          updateState({ isLoading: false });
+          return;
+        }
+
+        const optimisticItems = originalItems.map((item) => {
+          if (item.id === movingItem.id) return { ...item, position: swappedItem.position };
+          if (item.id === swappedItem.id) return { ...item, position: movingItem.position };
+          return item;
+        });
+        updateState({ flatItems: optimisticItems });
+
+        try {
+          const tempPosition = Math.max(...originalItems.map((i) => i.position)) + 1;
+
+          const apiCall = async (id: string, position: number) => {
+            const response = await fetch(`/api/roadmaps/${initialData.id}/items/${id}`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ position }),
+            });
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+          };
+
+          await apiCall(movingItem.id, tempPosition);
+          await apiCall(swappedItem.id, movingItem.position);
+          await apiCall(movingItem.id, swappedItem.position);
+        } catch (error) {
+          updateState({
+            flatItems: originalItems,
+            error: error instanceof Error ? error.message : "Wystąpił nieoczekiwany błąd podczas zmiany kolejności",
+          });
+        } finally {
+          updateState({ isLoading: false });
+        }
       },
-      [initialData.id, state.flatItems, updateState, performOptimisticUpdate]
+      [initialData.id, state.flatItems, updateState]
     ),
   };
 

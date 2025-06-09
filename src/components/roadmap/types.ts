@@ -35,5 +35,5 @@ export interface RoadmapEditorActions {
     updates: { title?: string; description?: string; is_completed?: boolean }
   ) => Promise<void>;
   deleteItem: (itemId: string) => Promise<void>;
-  reorderItems: (activeId: string, overId: string | null, newIndex: number) => Promise<void>;
+  moveItem: (itemId: string, direction: "up" | "down") => Promise<void>;
 }

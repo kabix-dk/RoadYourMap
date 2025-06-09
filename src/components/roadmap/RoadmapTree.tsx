@@ -1,73 +1,17 @@
 import React from "react";
-import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, closestCenter } from "@dnd-kit/core";
-import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { RoadmapItem } from "./RoadmapItem";
-import { SortableRoadmapItem } from "./SortableRoadmapItem";
 import type { RoadmapItemViewModel } from "./types";
 
 interface RoadmapTreeProps {
   items: RoadmapItemViewModel[];
-  onReorder: (activeId: string, overId: string | null, newIndex: number) => void;
+  onMoveItem: (itemId: string, direction: "up" | "down") => void;
   onUpdate: (itemId: string, updates: { title?: string; description?: string; is_completed?: boolean }) => void;
   onDelete: (itemId: string) => void;
   onAdd: (parentId?: string) => void;
   isLoading?: boolean;
 }
 
-export function RoadmapTree({ items, onReorder, onUpdate, onDelete, onAdd, isLoading = false }: RoadmapTreeProps) {
-  const [activeItem, setActiveItem] = React.useState<RoadmapItemViewModel | null>(null);
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
-
-  // Funkcja pomocnicza do spłaszczania drzewa dla DnD
-  const flattenItems = (items: RoadmapItemViewModel[]): RoadmapItemViewModel[] => {
-    const result: RoadmapItemViewModel[] = [];
-
-    const traverse = (items: RoadmapItemViewModel[]) => {
-      items.forEach((item) => {
-        result.push(item);
-        if (item.children && item.children.length > 0) {
-          traverse(item.children);
-        }
-      });
-    };
-
-    traverse(items);
-    return result;
-  };
-
-  const flatItems = flattenItems(items);
-  const itemIds = flatItems.map((item) => item.id);
-
-  const handleDragStart = (event: DragStartEvent) => {
-    const { active } = event;
-    const activeItem = flatItems.find((item) => item.id === active.id);
-    setActiveItem(activeItem || null);
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    setActiveItem(null);
-
-    if (!over || active.id === over.id) {
-      return;
-    }
-
-    const activeIndex = flatItems.findIndex((item) => item.id === active.id);
-    const overIndex = flatItems.findIndex((item) => item.id === over.id);
-
-    if (activeIndex !== -1 && overIndex !== -1) {
-      onReorder(active.id as string, over.id as string, overIndex);
-    }
-  };
-
+export function RoadmapTree({ items, onMoveItem, onUpdate, onDelete, onAdd, isLoading = false }: RoadmapTreeProps) {
   const handleAddRootItem = () => {
     onAdd();
   };
@@ -106,43 +50,21 @@ export function RoadmapTree({ items, onReorder, onUpdate, onDelete, onAdd, isLoa
         </button>
       </div>
 
-      {/* DnD Context */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-          <div className="space-y-4">
-            {items.map((item) => (
-              <SortableRoadmapItem
-                key={item.id}
-                item={item}
-                onUpdate={onUpdate}
-                onDelete={onDelete}
-                onAdd={onAdd}
-                isLoading={isLoading}
-              />
-            ))}
-          </div>
-        </SortableContext>
-
-        {/* Drag Overlay */}
-        <DragOverlay>
-          {activeItem ? (
-            <div className="opacity-90 transform rotate-2 shadow-lg">
-              <RoadmapItem
-                item={activeItem}
-                onUpdate={() => undefined}
-                onDelete={() => undefined}
-                onAdd={() => undefined}
-                isLoading={false}
-              />
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+      <div className="space-y-4">
+        {items.map((item, index) => (
+          <RoadmapItem
+            key={item.id}
+            item={item}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+            onAdd={onAdd}
+            onMoveItem={onMoveItem}
+            isLoading={isLoading}
+            itemIndex={index}
+            totalItems={items.length}
+          />
+        ))}
+      </div>
     </div>
   );
 }
