@@ -91,6 +91,9 @@ export function useRoadmapEditor(initialData: RoadmapDetailsDto) {
       async (command) => {
         updateState({ isLoading: true });
 
+        const siblings = state.flatItems.filter((item) => item.parent_item_id === (command.parent_item_id || null));
+        const maxPosition = siblings.reduce((max, item) => Math.max(max, item.position), 0);
+
         const newItem: RoadmapItemDto = {
           id: `temp-${Date.now()}`, // Tymczasowe ID
           parent_item_id: command.parent_item_id || null,
@@ -99,7 +102,7 @@ export function useRoadmapEditor(initialData: RoadmapDetailsDto) {
           level: command.parent_item_id
             ? (state.flatItems.find((item) => item.id === command.parent_item_id)?.level || 0) + 1
             : 1,
-          position: state.flatItems.filter((item) => item.parent_item_id === (command.parent_item_id || null)).length,
+          position: maxPosition * 1000,
           is_completed: false,
           completed_at: null,
         };
@@ -147,13 +150,48 @@ export function useRoadmapEditor(initialData: RoadmapDetailsDto) {
       async (itemId, updates) => {
         updateState({ isLoading: true });
 
+        const isCompletionUpdate = "is_completed" in updates;
+
         await performOptimisticUpdate(
-          () => state.flatItems.map((item) => (item.id === itemId ? { ...item, ...updates } : item)),
+          () => {
+            if (isCompletionUpdate && typeof updates.is_completed === "boolean") {
+              const isCompleted = updates.is_completed;
+              const itemsToUpdate = new Set<string>();
+
+              const findChildrenRecursive = (parentId: string) => {
+                const children = state.flatItems.filter((item) => item.parent_item_id === parentId);
+                for (const child of children) {
+                  itemsToUpdate.add(child.id);
+                  findChildrenRecursive(child.id);
+                }
+              };
+
+              findChildrenRecursive(itemId);
+
+              const completedAt = isCompleted ? new Date().toISOString() : null;
+
+              return state.flatItems.map((item) => {
+                if (item.id === itemId) {
+                  return { ...item, ...updates, completed_at: completedAt };
+                }
+                if (itemsToUpdate.has(item.id)) {
+                  return {
+                    ...item,
+                    is_completed: isCompleted,
+                    completed_at: completedAt,
+                  };
+                }
+                return item;
+              });
+            }
+            return state.flatItems.map((item) => (item.id === itemId ? { ...item, ...updates } : item));
+          },
           async () => {
             const updateCommand: UpdateRoadmapItemCommand = updates;
+            const method = isCompletionUpdate ? "PUT" : "PATCH";
 
             const response = await fetch(`/api/roadmaps/${initialData.id}/items/${itemId}`, {
-              method: "PATCH",
+              method,
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(updateCommand),
             });
