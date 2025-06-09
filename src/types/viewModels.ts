@@ -1,4 +1,4 @@
-import type { RoadmapDetailsDto, RoadmapItemDto } from "@/types";
+import type { RoadmapDetailsDto } from "@/types";
 
 export interface RoadmapItemViewModel {
   id: string;

@@ -1,10 +1,5 @@
 import type { APIRoute } from "astro";
-import {
-  basicExample,
-  complexSchemaExample,
-  jsonSchemaExample,
-  minimalJsonTest,
-} from "../../../lib/examples/openrouter.example";
+import { basicExample } from "../../../lib/examples/openrouter.example";
 import { generateRoadmapExample } from "@/lib/examples/ai-roadmap.example";
 
 export const POST: APIRoute = async () => {
