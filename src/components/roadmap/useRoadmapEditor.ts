@@ -60,7 +60,7 @@ export function useRoadmapEditor(initialData: RoadmapDetailsDto) {
   const performOptimisticUpdate = useCallback(
     async <T>(
       optimisticUpdate: () => RoadmapItemDto[],
-      apiCall: () => Promise<T>,
+      apiCall: (optimisticallyUpdatedItems: RoadmapItemDto[]) => Promise<T>,
       rollbackUpdate?: () => RoadmapItemDto[]
     ): Promise<T | null> => {
       const originalItems = state.flatItems;
@@ -71,7 +71,7 @@ export function useRoadmapEditor(initialData: RoadmapDetailsDto) {
         updateState({ flatItems: newItems, error: null });
 
         // Wywołanie API
-        const result = await apiCall();
+        const result = await apiCall(newItems);
         return result;
       } catch (error) {
         // Rollback w przypadku błędu
@@ -106,7 +106,7 @@ export function useRoadmapEditor(initialData: RoadmapDetailsDto) {
 
         await performOptimisticUpdate(
           () => [...state.flatItems, newItem],
-          async () => {
+          async (optimisticallyUpdatedItems) => {
             const createCommand: CreateRoadmapItemCommand = {
               parent_item_id: command.parent_item_id || null,
               title: command.title,
@@ -129,7 +129,7 @@ export function useRoadmapEditor(initialData: RoadmapDetailsDto) {
 
             // Aktualizujemy element z prawdziwym ID z serwera
             updateState({
-              flatItems: state.flatItems.map((item) =>
+              flatItems: optimisticallyUpdatedItems.map((item) =>
                 item.id === newItem.id ? { ...createdItem, children: [] } : item
               ),
             });
