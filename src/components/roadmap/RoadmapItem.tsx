@@ -81,7 +81,7 @@ export function RoadmapItem({
         variant="ghost"
         onClick={() => onMoveItem(item.id, "up")}
         disabled={isLoading || itemIndex === 0}
-        className="h-6 w-6"
+        className="h-6 w-6 cursor-pointer"
       >
         <ArrowUp className="h-4 w-4 text-gray-600 dark:text-gray-400" />
         <span className="sr-only">Przesuń w górę</span>
@@ -91,7 +91,7 @@ export function RoadmapItem({
         variant="ghost"
         onClick={() => onMoveItem(item.id, "down")}
         disabled={isLoading || itemIndex === totalItems - 1}
-        className="h-6 w-6"
+        className="h-6 w-6 cursor-pointer"
       >
         <ArrowDown className="h-4 w-4 text-gray-600 dark:text-gray-400" />
         <span className="sr-only">Przesuń w dół</span>
@@ -144,7 +144,7 @@ export function RoadmapItem({
             variant="default"
             onClick={handleAddChild}
             disabled={isLoading || item.level >= 3}
-            className="h-7 px-2 text-xs bg-gray-800 hover:bg-gray-900 text-white"
+            className="h-7 px-2 text-xs bg-gray-800 hover:bg-gray-900 text-white cursor-pointer"
           >
             <Plus className="h-3 w-3 mr-1" />
             Dodaj
@@ -155,7 +155,7 @@ export function RoadmapItem({
             variant="outline"
             onClick={handleDeleteClick}
             disabled={isLoading}
-            className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+            className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
           >
             <Trash2 className="h-3 w-3 mr-1" />
             Usuń
@@ -266,7 +266,7 @@ export function RoadmapItem({
                       variant="default"
                       onClick={handleAddChild}
                       disabled={isLoading || item.level >= 3}
-                      className="h-7 px-2 text-xs bg-gray-800 hover:bg-gray-900 text-white"
+                      className="h-7 px-2 text-xs bg-gray-800 hover:bg-gray-900 text-white cursor-pointer"
                     >
                       <Plus className="h-3 w-3 mr-1" />
                       Dodaj
@@ -277,7 +277,7 @@ export function RoadmapItem({
                       variant="outline"
                       onClick={handleDeleteClick}
                       disabled={isLoading}
-                      className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="h-7 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
                     >
                       <Trash2 className="h-3 w-3 mr-1" />
                       Usuń

@@ -114,11 +114,17 @@ export function InlineEditor({
               variant="ghost"
               onClick={handleSave}
               disabled={!isValid || isLoading}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 cursor-pointer"
             >
               <Check className="h-4 w-4 text-green-600" />
             </Button>
-            <Button size="sm" variant="ghost" onClick={handleCancel} disabled={isLoading} className="h-8 w-8 p-0">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleCancel}
+              disabled={isLoading}
+              className="h-8 w-8 p-0 cursor-pointer"
+            >
               <X className="h-4 w-4 text-red-600" />
             </Button>
           </div>

@@ -50,10 +50,10 @@ export function ConfirmDeleteDialog({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+          <Button variant="outline" onClick={onClose} disabled={isLoading} className="cursor-pointer">
             Anuluj
           </Button>
-          <Button variant="destructive" onClick={handleConfirm} disabled={isLoading}>
+          <Button variant="destructive" onClick={handleConfirm} disabled={isLoading} className="cursor-pointer">
             {isLoading ? "Usuwanie..." : "Usuń"}
           </Button>
         </DialogFooter>

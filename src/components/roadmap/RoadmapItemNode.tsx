@@ -70,7 +70,7 @@ export function RoadmapItemNode({
         <button
           type="button"
           className={cn(
-            "p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-grab active:cursor-grabbing",
+            "p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded cursor-grab active:cursor-grabbing cursor-pointer",
             "opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           )}
           {...attributes}
@@ -84,7 +84,7 @@ export function RoadmapItemNode({
           <button
             type="button"
             onClick={() => onToggleExpand(item.id)}
-            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200"
+            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors duration-200 cursor-pointer"
             aria-expanded={item.isExpanded}
             aria-label={item.isExpanded ? "Collapse section" : "Expand section"}
           >

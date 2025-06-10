@@ -101,7 +101,7 @@ function SingleLineEdit({ initialValue, onSave, validate, placeholder, className
       onClick={handleStartEdit}
       onKeyDown={handleKeyDown}
       className={cn(
-        "w-full text-left px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800",
+        "w-full text-left px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer",
         !value && "text-gray-500 italic",
         className
       )}
@@ -208,7 +208,7 @@ function MultiLineEdit({ initialValue, onSave, validate, placeholder, className 
       onClick={handleStartEdit}
       onKeyDown={handleKeyDown}
       className={cn(
-        "w-full text-left px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800",
+        "w-full text-left px-2 py-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer",
         !value && "text-gray-500 italic",
         className
       )}
