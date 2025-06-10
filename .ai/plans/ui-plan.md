@@ -42,8 +42,8 @@ Interfejs oparty na ciemnym motywie "Dracula", wykorzystujący Tailwind CSS i ko
   - Ścieżka: `/roadmaps/preview`
   - Główny cel: prezentacja struktury roadmapy wygenerowanej przez AI
   - Kluczowe informacje: drzewo 2–3 poziomy z tytułami i opisami
-  - Kluczowe komponenty: `Accordion`/`Tree`, `Spinner`, `InlineEditing`, `DndContext` (drag-and-drop)
-  - UX: rozwijane listy, inline editing, drag-and-drop
+  - Kluczowe komponenty: `Accordion`/`Tree`, `Spinner`, `InlineEditing`
+  - UX: rozwijane listy, inline editing
   - Bezpieczeństwo: sanitizacja treści, ochrona XSS
 
 - Nazwa widoku: Szczegóły Roadmapy
@@ -58,8 +58,8 @@ Interfejs oparty na ciemnym motywie "Dracula", wykorzystujący Tailwind CSS i ko
   - Ścieżka: `/roadmaps/:id/edit`
   - Główny cel: edycja i modyfikacja istniejącej roadmapy
   - Kluczowe informacje: drzewo 2–3 poziomy, narzędzia inline editing, pozycjonowanie elementów
-  - Kluczowe komponenty: `Accordion`/`Tree`, `InlineEditing`, `DndContext`, `Dialog`, `Button`, `Spinner`
-  - UX: drag-and-drop, potwierdzenia usuwania, ręczne zapisywanie zmian
+  - Kluczowe komponenty: `Accordion`/`Tree`, `InlineEditing`, `ReorderArrows`, `Dialog`, `Button`, `Spinner`
+  - UX: zmiana kolejności elementów za pomocą strzałek, potwierdzenia usuwania, ręczne zapisywanie zmian
   - Bezpieczeństwo: walidacja, kontrola praw dostępu
 
 - Nazwa widoku: Profil Użytkownika
@@ -77,7 +77,7 @@ Interfejs oparty na ciemnym motywie "Dracula", wykorzystujący Tailwind CSS i ko
 3. Z poziomu dashboard użytkownik może:
    a. Kliknąć "Utwórz Roadmapę" → `/roadmaps/create` → wypełnić formularz → wygenerować AI → przejść do `/roadmaps/preview`.
    b. Wybrać istniejącą roadmapę z listy → `/roadmaps/:id` (podgląd) → oznaczać ukończenie etapów lub przejść do edycji (`/roadmaps/:id/edit`).
-4. W `/roadmaps/:id/edit` użytkownik edytuje drzewo roadmapy, korzysta z drag-and-drop i potwierdzeń usuwania → zapisuje zmiany.
+4. W `/roadmaps/:id/edit` użytkownik edytuje drzewo roadmapy, zmienia kolejność elementów za pomocą strzałek i potwierdzeń usuwania → zapisuje zmiany.
 5. Górny pasek nawigacji dostępny w każdej fazie: Dashboard, Utwórz Roadmapę, Profil, Wyloguj.
 6. Przy wylogowaniu (wybór w menu Profil lub button Logout) wyświetlany dialog potwierdzenia i zapis niesaved edits, następnie wylogowanie.
 
@@ -97,7 +97,7 @@ Interfejs oparty na ciemnym motywie "Dracula", wykorzystujący Tailwind CSS i ko
 - **AuthForm** – komponent formularzy logowania i rejestracji (React Hook Form + Zod)
 - **Accordion/Tree** – hierarchiczna prezentacja roadmapy (Shadcn/ui)
 - **InlineEditing** – edycja tekstu w miejscu
-- **DndContext** (dnd-kit) – drag-and-drop elementów roadmapy
+- **ReorderArrows** – zmiana kolejności elementów roadmapy za pomocą strzałek
 - **Dialog** – potwierdzenia krytycznych akcji (usunięcie, wylogowanie)
 - **ProgressBar** – wizualizacja postępu (Shadcn/ui)
 - **Spinner** – stany ładowania (Shadcn/ui)

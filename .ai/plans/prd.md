@@ -15,7 +15,7 @@ Użytkownicy mają trudności z samodzielnym planowaniem nauki nowych technologi
 - Generowanie roadmapy przez AI na podstawie danych z formularza.
 - Struktura roadmapy: 2–3 poziomy (rozdziały, podrozdziały, kroki).
 - Prezentacja roadmapy jako rozwijanej, czytelnej listy.
-- Edycja roadmapy na wszystkich poziomach: dodawanie, usuwanie, edycja, zmiana kolejności elementów (opcjonalnie).
+- Edycja roadmapy na wszystkich poziomach: dodawanie, usuwanie, edycja, zmiana kolejności elementów za pomocą strzałek (opcjonalnie).
 - Oznaczanie ukończonych elementów roadmapy.
 - Pasek postępu w widoku podsumowania roadmapy.
 - Ręczny zapis zmian oraz automatyczny zapis przy wylogowaniu.
@@ -80,7 +80,7 @@ Tytuł: Edycja roadmapy
 Opis: Jako użytkownik chcę edytować roadmapę, aby dostosować ją do swoich potrzeb.  
 Kryteria akceptacji:
 - Użytkownik może dodawać, usuwać i edytować elementy na każdym poziomie roadmapy.
-- Możliwa jest zmiana kolejności elementów (opcjonalnie).
+- Użytkownik może zmieniać kolejność elementów za pomocą strzałek (opcjonalnie).
 - Zmiany są widoczne natychmiast w interfejsie.
 
 US-007  
