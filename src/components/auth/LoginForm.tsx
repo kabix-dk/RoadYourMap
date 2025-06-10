@@ -146,7 +146,11 @@ export default function LoginForm() {
           {errors.password && <p className="text-sm text-red-300">{errors.password}</p>}
         </div>
 
-        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={isLoading}>
+        <Button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white hover:cursor-pointer"
+          disabled={isLoading}
+        >
           {isLoading ? (
             <>
               <Spinner className="mr-2 h-4 w-4" />
@@ -158,10 +162,7 @@ export default function LoginForm() {
         </Button>
       </form>
 
-      <div className="text-center space-y-2">
-        <a href="/auth/forgot-password" className="text-sm text-blue-200 hover:text-white transition-colors">
-          Zapomniałeś hasła?
-        </a>
+      <div className="text-center">
         <p className="text-sm text-blue-200">
           Nie masz konta?{" "}
           <a href="/auth/register" className="text-white hover:underline font-medium">

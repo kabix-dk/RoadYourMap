@@ -177,7 +177,11 @@ export default function RegisterForm() {
           {errors.confirmPassword && <p className="text-sm text-red-300">{errors.confirmPassword}</p>}
         </div>
 
-        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={isLoading}>
+        <Button
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white hover:cursor-pointer"
+          disabled={isLoading}
+        >
           {isLoading ? (
             <>
               <Spinner className="mr-2 h-4 w-4" />
