@@ -21,6 +21,7 @@
 - **Frontend:** Astro 5, React 19, TypeScript 5
 - **Styling:** Tailwind CSS 4, Shadcn/ui
 - **Backend-as-a-Service:** Supabase (Authentication & PostgreSQL)
+- **Testing:** Vitest (Unit/Integration), Playwright (E2E), React Testing Library, MSW (Mock Service Worker)
 - **AI Integration:** OpenRouter.ai for model access (OpenAI, Anthropic, Google, etc.)
 - **Node Version:** 22.14.0 (via .nvmrc)
 - **CI/CD & Hosting:** GitHub Actions, DigitalOcean (Docker)
