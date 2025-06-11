@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useRoadmapEditor } from "../useRoadmapEditor";
+import { useRoadmapEditor } from "../hooks/useRoadmapEditor";
 import type { RoadmapDetailsDto, RoadmapItemDto } from "@/types";
 
 // Mock fetch globally
