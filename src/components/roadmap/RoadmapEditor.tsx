@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { RoadmapTree } from "./RoadmapTree";
-import { useRoadmapEditor } from "./useRoadmapEditor";
+import { useRoadmapEditor } from "../hooks/useRoadmapEditor";
 import type { RoadmapDetailsDto } from "@/types";
 
 interface RoadmapEditorProps {

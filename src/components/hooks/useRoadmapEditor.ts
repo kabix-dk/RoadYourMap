@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import type { RoadmapDetailsDto, RoadmapItemDto, CreateRoadmapItemCommand, UpdateRoadmapItemCommand } from "@/types";
-import type { RoadmapItemViewModel, RoadmapEditorState, RoadmapEditorActions } from "./types";
+import type { RoadmapItemViewModel, RoadmapEditorState, RoadmapEditorActions } from "../roadmap/types";
 
 /**
  * Transformuje płaską listę elementów roadmapy w zagnieżdżoną strukturę drzewa
@@ -24,6 +24,7 @@ function buildNestedItems(flatItems: RoadmapItemDto[]): RoadmapItemViewModel[] {
       if (parent) {
         parent.children.push(viewModel);
       }
+      // If parent doesn't exist, item is orphaned and won't be included
     } else {
       rootItems.push(viewModel);
     }
