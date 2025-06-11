@@ -12,15 +12,7 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
-      exclude: [
-        "node_modules/",
-        "src/test/",
-        "**/*.d.ts",
-        "**/*.config.*",
-        "**/coverage/**",
-        "**/dist/**",
-        "**/.astro/**",
-      ],
+      exclude: ["node_modules/", "src/test/", "**/*.d.ts", "**/*.config.*", "**/coverage/**", "dist/", ".astro/"],
       thresholds: {
         global: {
           branches: 80,
@@ -47,6 +39,7 @@ export default defineConfig({
       json: "./coverage/test-results.json",
       html: "./coverage/test-results.html",
     },
+    // Watch mode is enabled by default in Vitest
   },
   resolve: {
     alias: {
