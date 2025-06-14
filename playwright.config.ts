@@ -25,7 +25,7 @@ export default defineConfig({
     baseURL: "http://localhost:3000",
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: "on-first-retry",
+    trace: "on",
 
     /* Take screenshot on failure */
     screenshot: "only-on-failure",
@@ -47,5 +47,8 @@ export default defineConfig({
     command: "npm run dev",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
+    env: {
+      ASTRO_DISABLE_DEV_TOOLBAR: "true",
+    },
   },
 });

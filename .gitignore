@@ -25,3 +25,7 @@ pnpm-debug.log*
 
 # todo file
 .ai/todo.md
+
+# e2e
+test-results/
+playwright-report/

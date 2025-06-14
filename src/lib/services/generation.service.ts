@@ -21,15 +21,21 @@ export async function generateRoadmap(data: CreateRoadmapCommand): Promise<Roadm
     });
 
     if (!response.ok) {
+      if (response.status === 302) {
+        throw new RoadmapError("Musisz być zalogowany, aby utworzyć roadmapę.", 401);
+      }
       if (response.status === 400) {
         const error = await response.json();
+        if (error.error === "User has reached max roadmaps") {
+          throw new RoadmapError("User has reached max roadmaps", 400);
+        }
         throw new RoadmapError(error.message || "Błąd walidacji danych.", 400);
       }
       if (response.status === 401) {
         throw new RoadmapError("Musisz być zalogowany, aby utworzyć roadmapę.", 401);
       }
       if (response.status === 429) {
-        throw new RoadmapError("Osiągnięto limit 5 roadmap. Nie można utworzyć nowej.", 429);
+        throw new RoadmapError("User has reached max roadmaps", 429);
       }
       if (response.status === 502) {
         throw new RoadmapError("Błąd usługi generowania roadmapy. Spróbuj ponownie później.", 502);
@@ -44,7 +50,7 @@ export async function generateRoadmap(data: CreateRoadmapCommand): Promise<Roadm
       throw error;
     }
     if (error instanceof TypeError && error.message === "Failed to fetch") {
-      throw new RoadmapError("Brak połączenia z internetem. Sprawdź swoje połączenie i spróbuj ponownie.");
+      throw new RoadmapError("Wystąpił nieoczekiwany błąd połączenia. Sprawdź swoje połączenie i spróbuj ponownie.");
     }
     throw new RoadmapError("Wystąpił nieoczekiwany błąd. Spróbuj ponownie później.");
   }

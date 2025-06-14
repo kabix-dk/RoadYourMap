@@ -3,9 +3,10 @@ import { cn } from "@/lib/utils";
 interface SpinnerProps {
   size?: "sm" | "md" | "lg";
   className?: string;
+  "data-test-id"?: string;
 }
 
-export function Spinner({ size = "md", className }: SpinnerProps) {
+export function Spinner({ size = "md", className, "data-test-id": dataTestId }: SpinnerProps) {
   const sizeClasses = {
     sm: "w-4 h-4",
     md: "w-8 h-8",
@@ -13,7 +14,7 @@ export function Spinner({ size = "md", className }: SpinnerProps) {
   };
 
   return (
-    <div role="status" className={cn("flex items-center justify-center", className)}>
+    <div role="status" className={cn("flex items-center justify-center", className)} data-test-id={dataTestId}>
       <svg
         className={cn("animate-spin text-gray-200 dark:text-gray-600", sizeClasses[size])}
         viewBox="0 0 100 101"
