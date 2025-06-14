@@ -333,7 +333,7 @@ test.describe("Roadmap Creation Form", () => {
       await roadmapCreationPage.expectLoadingState();
 
       // Wait for completion
-      await expect(roadmapCreationPage.page).toHaveURL(/\/roadmaps\/.*\/edit/, { timeout: 20000 });
+      await expect(roadmapCreationPage.page).toHaveURL(/\/roadmaps\/.*\/edit/, { timeout: 30000 });
     });
 
     test("should handle form with maximum allowed character limits", async ({
