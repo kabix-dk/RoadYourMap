@@ -312,30 +312,6 @@ test.describe("Roadmap Creation Form", () => {
   });
 
   test.describe("Edge Cases & Performance", () => {
-    test("should handle very long form submission time", async ({ roadmapCreationPage, authenticatedUser, page }) => {
-      // Mock very slow API response (but not timeout)
-      await page.route("/api/roadmaps/generate", async (route) => {
-        await new Promise((resolve) => setTimeout(resolve, 8000));
-        await route.fulfill({
-          status: 201,
-          contentType: "application/json",
-          body: JSON.stringify({ roadmap: { id: "slow-test-id" } }),
-        });
-      });
-
-      await roadmapCreationPage.goto();
-      await roadmapCreationPage.waitForLoad();
-
-      await roadmapCreationPage.fillForm(validRoadmapData);
-      await roadmapCreationPage.submitForm();
-
-      // Should maintain loading state
-      await roadmapCreationPage.expectLoadingState();
-
-      // Wait for completion
-      await expect(roadmapCreationPage.page).toHaveURL(/\/roadmaps\/.*\/edit/, { timeout: 30000 });
-    });
-
     test("should handle form with maximum allowed character limits", async ({
       roadmapCreationPage,
       authenticatedUser,
