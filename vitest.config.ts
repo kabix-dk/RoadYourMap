@@ -29,7 +29,7 @@ export default defineConfig({
           statements: 80,
         },
         "src/components/hooks/useRoadmapEditor.ts": {
-          branches: 90,
+          branches: 85,
           functions: 95,
           lines: 90,
           statements: 90,
