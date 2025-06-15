@@ -1,4 +1,4 @@
-# RoadYourMap - TEST
+# RoadYourMap
 
 **RoadYourMap** is a web application that automates the generation of personalized learning roadmaps for programming languages and IT technologies. Designed as an MVP with a focus on simplicity, clarity, and ease of use, it helps technical learners plan, track, and manage their learning journey.
 
