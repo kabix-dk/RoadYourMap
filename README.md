@@ -12,7 +12,6 @@
   - [Available Scripts](#available-scripts)
   - [Project Scope](#project-scope)
     - [Included in MVP](#included-in-mvp)
-    - [Out of Scope for MVP](#out-of-scope-for-mvp)
   - [Project Status](#project-status)
   - [License](#license)
 
@@ -75,16 +74,8 @@ In the project directory, you can run:
 - **Interactive Roadmap:** Expandable list view, edit elements (add, remove, reorder), and mark items as complete.
 - **Progress Tracking:** Progress bar updates with completed items.
 - **User Accounts:** Supabase-based registration, login, and session management.
-- **Roadmap Storage:** Save up to 5 roadmaps per user, with manual save and auto-save on logout.
+- **Roadmap Storage:** Save up to 5 roadmaps per user, with auto-save.
 - **Error Handling:** User-friendly validation and error messages throughout the app.
-
-### Out of Scope for MVP
-- Mobile-specific UI/UX
-- Exporting or cloning roadmaps
-- Advanced onboarding flows or UI personalization
-- Rich visual editors beyond list-based views
-- Comprehensive user profiles or advanced notifications
-- Usability testing integrations
 
 ## Project Status
 
