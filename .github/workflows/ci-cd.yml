@@ -1,0 +1,263 @@
+name: CI/CD Pipeline
+
+on:
+  # Uruchamianie po push do main/master
+  push:
+    branches: [main, master]
+  
+  # Uruchamianie po pull request do main/master
+  pull_request:
+    branches: [main, master]
+  
+  # Uruchamianie manualne
+  workflow_dispatch:
+    inputs:
+      run_e2e_tests:
+        description: 'Run E2E tests'
+        required: false
+        default: 'true'
+        type: boolean
+      deploy_environment:
+        description: 'Deployment environment'
+        required: false
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  NODE_VERSION: '22.14.0'
+  CACHE_KEY_PREFIX: 'roadyourmap-v1'
+
+jobs:
+  # Job 1: Linting i formatowanie
+  lint:
+    name: 🔍 Lint & Format Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: npm ci
+        
+      - name: 🔍 Run ESLint
+        run: npm run lint
+        
+      - name: 💅 Check Prettier formatting
+        run: npx prettier --check .
+
+  # Job 2: Testy jednostkowe
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: npm ci
+        
+      - name: 🧪 Run unit tests with coverage
+        run: npm run test:coverage
+        
+      - name: 📊 Upload coverage reports
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: ./coverage/coverage-final.json
+          flags: unittests
+          name: unit-tests-coverage
+          fail_ci_if_error: false
+          
+      - name: 📋 Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-results
+          path: |
+            coverage/
+            !coverage/node_modules
+          retention-days: 7
+
+  # Job 3: Build produkcyjny
+  build:
+    name: 🏗️ Production Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [lint]
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: npm ci
+        
+      - name: 🏗️ Build for production
+        run: npm run build
+        env:
+          NODE_ENV: production
+          
+      - name: 📦 Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: |
+            dist/
+            !dist/node_modules
+          retention-days: 7
+          
+      - name: 📊 Check build size
+        run: |
+          echo "## Build Size Report 📊" >> $GITHUB_STEP_SUMMARY
+          echo "| File | Size |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|------|" >> $GITHUB_STEP_SUMMARY
+          find dist -name "*.js" -o -name "*.css" | head -10 | while read file; do
+            size=$(du -h "$file" | cut -f1)
+            echo "| $file | $size |" >> $GITHUB_STEP_SUMMARY
+          done
+
+  # Job 4: Testy E2E (opcjonalne)
+  e2e-tests:
+    name: 🎭 E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [build]
+    if: |
+      (github.event_name == 'workflow_dispatch' && inputs.run_e2e_tests == 'true') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/master')
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 📦 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: 📥 Install dependencies
+        run: npm ci
+        
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: dist/
+          
+      - name: 🎭 Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        
+      - name: 🎭 Run E2E tests
+        run: npm run test:e2e
+        env:
+          CI: true
+          
+      - name: 📋 Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+  # Job 5: Podsumowanie i raportowanie
+  summary:
+    name: 📋 Pipeline Summary
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests, build, e2e-tests]
+    if: always()
+    
+    steps:
+      - name: 📋 Generate summary
+        run: |
+          echo "# 🚀 CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Job Status" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint & Format | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Production Build | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| E2E Tests | ${{ needs.e2e-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Trigger Information" >> $GITHUB_STEP_SUMMARY
+          echo "- **Event**: ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Actor**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          
+      - name: ❌ Fail pipeline if critical jobs failed
+        if: |
+          needs.lint.result == 'failure' ||
+          needs.unit-tests.result == 'failure' ||
+          needs.build.result == 'failure'
+        run: |
+          echo "❌ Pipeline failed due to critical job failures"
+          exit 1
+          
+      - name: ⚠️ Warning for E2E test failures
+        if: needs.e2e-tests.result == 'failure'
+        run: |
+          echo "⚠️ E2E tests failed, but pipeline continues"
+          echo "Please check E2E test results and fix issues"
+
+  # Job 6: Deployment (opcjonalny - tylko dla workflow_dispatch)
+  deploy:
+    name: 🚀 Deploy
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests, build]
+    if: |
+      github.event_name == 'workflow_dispatch' &&
+      needs.lint.result == 'success' &&
+      needs.unit-tests.result == 'success' &&
+      needs.build.result == 'success'
+    environment: ${{ inputs.deploy_environment || 'staging' }}
+    
+    steps:
+      - name: 📥 Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: production-build
+          path: dist/
+          
+      - name: 🚀 Deploy to ${{ inputs.deploy_environment || 'staging' }}
+        run: |
+          echo "🚀 Deploying to ${{ inputs.deploy_environment || 'staging' }} environment"
+          echo "Build artifacts ready for deployment"
+          # Tutaj można dodać rzeczywiste kroki deploymentu
+          # np. rsync, docker build & push, itp.
+          
+      - name: ✅ Deployment success
+        run: |
+          echo "## 🚀 Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "Environment: **${{ inputs.deploy_environment || 'staging' }}**" >> $GITHUB_STEP_SUMMARY
+          echo "Deployed at: $(date)" >> $GITHUB_STEP_SUMMARY 
